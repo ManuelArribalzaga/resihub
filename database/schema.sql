@@ -1,15 +1,5 @@
--- ================================================================
---  ResiHub · Esquema de Base de Datos
---  TecNM Campus Minatitlán · V3
--- ================================================================
+-- ResiHub · Schema para Aiven (defaultdb)
 
-CREATE DATABASE IF NOT EXISTS resihub_db
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-USE resihub_db;
-
--- ─── TABLA: usuarios ─────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS usuarios (
   id            INT AUTO_INCREMENT PRIMARY KEY,
   nombre        VARCHAR(120)  NOT NULL,
@@ -21,7 +11,6 @@ CREATE TABLE IF NOT EXISTS usuarios (
   updated_at    TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- ─── TABLA: etapas ───────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS etapas (
   id          INT AUTO_INCREMENT PRIMARY KEY,
   nombre      VARCHAR(80)   NOT NULL,
@@ -31,16 +20,15 @@ CREATE TABLE IF NOT EXISTS etapas (
   orden       TINYINT       NOT NULL DEFAULT 1
 ) ENGINE=InnoDB;
 
--- ─── TABLA: documentos ───────────────────────────────────────
 CREATE TABLE IF NOT EXISTS documentos (
   id              INT AUTO_INCREMENT PRIMARY KEY,
   etapa_id        INT           NOT NULL,
   titulo          VARCHAR(200)  NOT NULL,
   descripcion     TEXT,
-  nombre_archivo  VARCHAR(255)  DEFAULT NULL,   -- nombre del archivo en /uploads
+  nombre_archivo  VARCHAR(255)  DEFAULT NULL,
   tipo            ENUM('formato','guia','manual','otro') NOT NULL DEFAULT 'formato',
   tiene_guia      TINYINT(1)    NOT NULL DEFAULT 0,
-  nombre_guia     VARCHAR(255)  DEFAULT NULL,   -- archivo de guía separado
+  nombre_guia     VARCHAR(255)  DEFAULT NULL,
   vigente         TINYINT(1)    NOT NULL DEFAULT 1,
   orden           TINYINT       NOT NULL DEFAULT 1,
   created_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -48,11 +36,10 @@ CREATE TABLE IF NOT EXISTS documentos (
   FOREIGN KEY (etapa_id) REFERENCES etapas(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- ─── TABLA: descargas ────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS descargas (
   id              INT AUTO_INCREMENT PRIMARY KEY,
   documento_id    INT           NOT NULL,
-  usuario_id      INT           DEFAULT NULL,   -- NULL = estudiante no logueado
+  usuario_id      INT           DEFAULT NULL,
   ip_origen       VARCHAR(60)   DEFAULT NULL,
   user_agent      VARCHAR(300)  DEFAULT NULL,
   fecha           TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
