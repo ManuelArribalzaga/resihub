@@ -1,0 +1,42 @@
+/* CONFIGURACIÓN GENERAL */
+body { font-family: 'Inter', sans-serif; color: #4b5563; }
+.fw-extrabold { font-weight: 800; }
+
+/* HERO (AZUL) */
+.hero-section {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+    position: relative;
+}
+.text-white-75 { color: rgba(255, 255, 255, 0.75) !important; }
+
+/* TARJETAS (PASOS) */
+.card-custom { border-radius: 20px !important; transition: transform 0.3s ease; border-width: 1px; }
+.card-custom:hover { transform: translateY(-5px); }
+.icon-box { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+.bg-blue-light { background-color: #e7f0ff; }
+.bg-gray-light { background-color: #f3f4f6; }
+.bg-red-light  { background-color: #fff1f2; }
+.border-step-blue { border-color: #3b82f6 !important; }
+.border-step-gray { border-color: #e5e7eb !important; }
+.border-step-red  { border-color: #fecaca !important; }
+
+/* BENEFICIOS (ICONOS) */
+.feat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+.bg-yellow-light { background-color: #fffbeb; }
+.bg-green-light { background-color: #f0fdf4; }
+
+/* SECCIÓN FINAL */
+.cta-section { background-color: #991b1b; } /* Guinda */
+.text-red { color: #991b1b !important; }
+.footer-dark { background-color: #1e293b; }
+.text-secondary { color: #94a3b8 !important; }
+.border-white-10 { border-color: rgba(255, 255, 255, 0.1) !important; }
+
+/* Añade esto al final de tu estilos.css */
+.btn-dark { background-color: #1e293b !important; border: none; }
+.btn-dark:hover { background-color: #334155 !important; }
+.bg-red-light { background-color: #fff1f2 !important; } /* Para las tarjetas rojas de abajo */
+
+html {
+    scroll-behavior: smooth;
+}

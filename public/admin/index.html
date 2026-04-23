@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - ResiHub</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --azul: #1d4ed8;
+            --azul-dark: #1e3a8a;
+            --guinda: #991b1b;
+        }
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; }
+
+        /* ── LOGIN ── */
+        #vista-login {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+        }
+        .login-card {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0,0,0,.25);
+        }
+
+        /* ── SIDEBAR ── */
+        #sidebar {
+            width: 250px; min-height: 100vh;
+            background: #1e293b;
+            transition: width .3s;
+            flex-shrink: 0;
+        }
+        #sidebar .nav-link { color: #94a3b8; border-radius: 10px; padding: .6rem 1rem; }
+        #sidebar .nav-link:hover,
+        #sidebar .nav-link.active { background: rgba(255,255,255,.08); color: #fff; }
+        #sidebar .nav-link i { width: 22px; }
+
+        /* ── CONTENIDO ── */
+        #contenido-principal { flex: 1; overflow-x: hidden; }
+        .stat-card { border-radius: 16px; border: none; }
+        .seccion { display: none; }
+        .seccion.activa { display: block; }
+
+        /* ── TABLAS ── */
+        .table-custom th { background: #f8fafc; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+        .table-custom td { vertical-align: middle; font-size: .88rem; }
+        .badge-vigente { background: #dcfce7; color: #166534; }
+        .badge-inactivo { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     VISTA LOGIN
+════════════════════════════════════════════════ -->
+<div id="vista-login" class="d-flex align-items-center justify-content-center p-4">
+    <div class="w-100" style="max-width:420px;">
+        <div class="text-center mb-4">
+            <img src="/img/ITMina.png" alt="ITMina" height="70" class="mb-3">
+            <h4 class="text-white fw-bold">Panel de Administración</h4>
+            <p class="text-white-50 small">ResiHub · TecNM Campus Minatitlán</p>
+        </div>
+        <div class="card login-card p-4">
+            <div id="login-error" class="alert alert-danger d-none small py-2" role="alert"></div>
+            <div class="mb-3">
+                <label class="form-label fw-bold small">Correo electrónico</label>
+                <input type="email" id="login-email" class="form-control rounded-3"
+                       placeholder="admin@itmina.edu.mx" value="admin@itmina.edu.mx">
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-bold small">Contraseña</label>
+                <input type="password" id="login-password" class="form-control rounded-3"
+                       placeholder="••••••••" value="Admin2026!">
+            </div>
+            <button id="btn-login" class="btn btn-primary w-100 fw-bold rounded-3 py-2"
+                    style="background:var(--azul);border:none;">
+                <span id="login-spinner" class="spinner-border spinner-border-sm me-2 d-none"></span>
+                Iniciar Sesión
+            </button>
+            <div class="text-center mt-3">
+                <a href="/" class="text-muted small text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>Volver al portal
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     VISTA DASHBOARD (oculto hasta login)
+════════════════════════════════════════════════ -->
+<div id="vista-dashboard" class="d-none d-flex" style="min-height:100vh;">
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar" class="p-3">
+        <div class="d-flex align-items-center gap-2 mb-4 px-1">
+            <i class="bi bi-mortarboard-fill text-white fs-5"></i>
+            <span class="text-white fw-bold">ResiHub Admin</span>
+        </div>
+        <ul class="nav flex-column gap-1">
+            <li><a href="#" class="nav-link active" data-seccion="dashboard">
+                <i class="bi bi-grid-1x2"></i> Dashboard
+            </a></li>
+            <li><a href="#" class="nav-link" data-seccion="documentos">
+                <i class="bi bi-file-earmark-text"></i> Documentos
+            </a></li>
+            <li><a href="#" class="nav-link" data-seccion="usuarios">
+                <i class="bi bi-people"></i> Usuarios
+            </a></li>
+            <li class="mt-4 border-top border-white border-opacity-10 pt-3">
+                <a href="/" class="nav-link">
+                    <i class="bi bi-box-arrow-left"></i> Ver Portal
+                </a>
+                <a href="#" id="btn-logout" class="nav-link text-danger">
+                    <i class="bi bi-power"></i> Cerrar Sesión
+                </a>
+            </li>
+        </ul>
+        <div class="mt-auto px-1 pt-4">
+            <p class="text-secondary small mb-0" id="sidebar-user"></p>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO -->
+    <main id="contenido-principal" class="p-4">
+
+        <!-- ── TOPBAR ── -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="fw-bold mb-0" id="titulo-seccion">Dashboard</h5>
+            <span class="badge bg-primary rounded-pill px-3 py-2 small" id="topbar-user"></span>
+        </div>
+
+        <!-- ══ SECCIÓN DASHBOARD ══ -->
+        <section id="sec-dashboard" class="seccion activa">
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card stat-card p-4 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted small mb-1">Documentos activos</p>
+                                <h3 class="fw-bold mb-0" id="st-docs">—</h3>
+                            </div>
+                            <div class="bg-blue-light rounded-3 p-3">
+                                <i class="bi bi-file-earmark-text text-primary fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card stat-card p-4 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted small mb-1">Descargas totales</p>
+                                <h3 class="fw-bold mb-0" id="st-descargas">—</h3>
+                            </div>
+                            <div class="bg-green-light rounded-3 p-3" style="background:#dcfce7;">
+                                <i class="bi bi-download text-success fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card stat-card p-4 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted small mb-1">Descargas hoy</p>
+                                <h3 class="fw-bold mb-0" id="st-hoy">—</h3>
+                            </div>
+                            <div class="rounded-3 p-3" style="background:#fef9c3;">
+                                <i class="bi bi-calendar-check text-warning fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card stat-card p-4 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted small mb-1">Usuarios</p>
+                                <h3 class="fw-bold mb-0" id="st-usuarios">—</h3>
+                            </div>
+                            <div class="rounded-3 p-3" style="background:#fce7f3;">
+                                <i class="bi bi-people text-pink fs-4" style="color:#db2777;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top documentos -->
+            <div class="card shadow-sm rounded-4 p-4">
+                <h6 class="fw-bold mb-3">Top documentos más descargados</h6>
+                <div id="tabla-top-docs">
+                    <div class="text-center py-3 text-muted small">Cargando...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ SECCIÓN DOCUMENTOS ══ -->
+        <section id="sec-documentos" class="seccion">
+            <!-- Botón nuevo -->
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-primary rounded-3 fw-bold btn-sm px-4"
+                        style="background:var(--azul);border:none;"
+                        onclick="abrirModalNuevoDoc()">
+                    <i class="bi bi-plus-lg me-2"></i>Nuevo Documento
+                </button>
+            </div>
+
+            <div class="card shadow-sm rounded-4">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-custom table-hover mb-0" id="tabla-documentos">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4 py-3">Título</th>
+                                    <th>Etapa</th>
+                                    <th>Archivo</th>
+                                    <th>Estado</th>
+                                    <th class="pe-4">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-documentos">
+                                <tr><td colspan="5" class="text-center py-4 text-muted small">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ SECCIÓN USUARIOS ══ -->
+        <section id="sec-usuarios" class="seccion">
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-primary rounded-3 fw-bold btn-sm px-4"
+                        style="background:var(--azul);border:none;"
+                        onclick="abrirModalNuevoUsuario()">
+                    <i class="bi bi-person-plus me-2"></i>Nuevo Admin
+                </button>
+            </div>
+            <div class="card shadow-sm rounded-4">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-custom table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="ps-4 py-3">Nombre</th>
+                                    <th>Email</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th class="pe-4">Registrado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-usuarios">
+                                <tr><td colspan="5" class="text-center py-4 text-muted small">Cargando...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL: NUEVO / EDITAR DOCUMENTO
+════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalDocumento" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="modal-doc-titulo">Nuevo Documento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-2" id="modal-doc-error-wrap">
+                <div id="modal-doc-error" class="alert alert-danger d-none small py-2"></div>
+                <div class="row g-3">
+                    <input type="hidden" id="doc-id">
+                    <div class="col-md-8">
+                        <label class="form-label fw-bold small">Título <span class="text-danger">*</span></label>
+                        <input type="text" id="doc-titulo" class="form-control rounded-3" placeholder="Ej: Solicitud de Residencia">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Etapa <span class="text-danger">*</span></label>
+                        <select id="doc-etapa" class="form-select rounded-3">
+                            <option value="1">1 - Solicitud</option>
+                            <option value="2">2 - Seguimiento</option>
+                            <option value="3">3 - Liberación</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold small">Descripción</label>
+                        <textarea id="doc-descripcion" class="form-control rounded-3" rows="2"
+                                  placeholder="Describe brevemente para qué sirve este documento..."></textarea>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Tipo</label>
+                        <select id="doc-tipo" class="form-select rounded-3">
+                            <option value="formato">Formato</option>
+                            <option value="guia">Guía</option>
+                            <option value="manual">Manual</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Orden</label>
+                        <input type="number" id="doc-orden" class="form-control rounded-3" value="1" min="1" max="20">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Estado</label>
+                        <select id="doc-vigente" class="form-select rounded-3">
+                            <option value="true">Vigente</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Archivo principal (PDF/DOCX)</label>
+                        <input type="file" id="doc-archivo" class="form-control rounded-3"
+                               accept=".pdf,.docx,.doc,.xlsx">
+                        <p class="text-muted small mt-1 mb-0">Máx. 10 MB</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Archivo de Guía (opcional)</label>
+                        <input type="file" id="doc-guia-archivo" class="form-control rounded-3"
+                               accept=".pdf,.docx,.doc">
+                        <p class="text-muted small mt-1 mb-0">Guía de llenado</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-outline-secondary rounded-3 btn-sm px-4"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="btn-guardar-doc"
+                        class="btn btn-primary rounded-3 fw-bold btn-sm px-4"
+                        style="background:var(--azul);border:none;"
+                        onclick="guardarDocumento()">
+                    <span id="spinner-doc" class="spinner-border spinner-border-sm me-2 d-none"></span>
+                    Guardar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL: NUEVO USUARIO
+════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalUsuario" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Nuevo Administrador</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <div id="modal-usr-error" class="alert alert-danger d-none small py-2"></div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Nombre completo</label>
+                    <input type="text" id="usr-nombre" class="form-control rounded-3">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Email</label>
+                    <input type="email" id="usr-email" class="form-control rounded-3">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Contraseña (mín. 8 caracteres)</label>
+                    <input type="password" id="usr-password" class="form-control rounded-3">
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button class="btn btn-outline-secondary rounded-3 btn-sm px-4"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-primary rounded-3 fw-bold btn-sm px-4"
+                        style="background:var(--azul);border:none;"
+                        onclick="guardarUsuario()">Crear Admin</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ─────────────────────────────────────────────
+//  ESTADO GLOBAL
+// ─────────────────────────────────────────────
+const API = '/api';
+let token = localStorage.getItem('rh_token') || '';
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    if (token) verificarToken();
+    // LOGIN: Enter key
+    document.getElementById('login-password').addEventListener('keydown', e => {
+        if (e.key === 'Enter') hacerLogin();
+    });
+    document.getElementById('btn-login').addEventListener('click', hacerLogin);
+    document.getElementById('btn-logout').addEventListener('click', cerrarSesion);
+
+    // SIDEBAR NAV
+    document.querySelectorAll('[data-seccion]').forEach(link => {
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            mostrarSeccion(link.dataset.seccion);
+        });
+    });
+});
+
+// ─────────────────────────────────────────────
+//  AUTH
+// ─────────────────────────────────────────────
+async function hacerLogin() {
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const errEl    = document.getElementById('login-error');
+    const spinner  = document.getElementById('login-spinner');
+
+    errEl.classList.add('d-none');
+    spinner.classList.remove('d-none');
+    document.getElementById('btn-login').disabled = true;
+
+    try {
+        const res  = await fetch(`${API}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const json = await res.json();
+
+        if (!json.ok) {
+            errEl.textContent = json.mensaje;
+            errEl.classList.remove('d-none');
+        } else {
+            token = json.token;
+            localStorage.setItem('rh_token', token);
+            mostrarDashboard(json.usuario);
+        }
+    } catch {
+        errEl.textContent = 'Error de conexión con el servidor.';
+        errEl.classList.remove('d-none');
+    } finally {
+        spinner.classList.add('d-none');
+        document.getElementById('btn-login').disabled = false;
+    }
+}
+
+async function verificarToken() {
+    try {
+        const res  = await fetch(`${API}/auth/me`, { headers: authHeaders() });
+        const json = await res.json();
+        if (json.ok) mostrarDashboard(json.usuario);
+        else cerrarSesion();
+    } catch { cerrarSesion(); }
+}
+
+function cerrarSesion() {
+    localStorage.removeItem('rh_token');
+    token = '';
+    document.getElementById('vista-login').classList.remove('d-none');
+    document.getElementById('vista-dashboard').classList.add('d-none');
+}
+
+function mostrarDashboard(usuario) {
+    document.getElementById('vista-login').classList.add('d-none');
+    document.getElementById('vista-dashboard').classList.remove('d-none');
+    document.getElementById('sidebar-user').textContent = usuario.nombre;
+    document.getElementById('topbar-user').textContent  = usuario.email;
+    cargarEstadisticas();
+    cargarTablaDocumentos();
+}
+
+// ─────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────
+function authHeaders() {
+    return { 'Authorization': `Bearer ${token}` };
+}
+function authHeadersJson() {
+    return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+}
+function mostrarSeccion(id) {
+    document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
+    document.querySelectorAll('[data-seccion]').forEach(l => l.classList.remove('active'));
+    document.getElementById(`sec-${id}`).classList.add('activa');
+    document.querySelector(`[data-seccion="${id}"]`).classList.add('active');
+    document.getElementById('titulo-seccion').textContent =
+        id.charAt(0).toUpperCase() + id.slice(1);
+    if (id === 'documentos') cargarTablaDocumentos();
+    if (id === 'usuarios')   cargarTablaUsuarios();
+}
+
+// ─────────────────────────────────────────────
+//  ESTADÍSTICAS
+// ─────────────────────────────────────────────
+async function cargarEstadisticas() {
+    try {
+        const res  = await fetch(`${API}/admin/estadisticas`, { headers: authHeaders() });
+        const json = await res.json();
+        if (!json.ok) return;
+        const d = json.data;
+        document.getElementById('st-docs').textContent      = d.totalDocs;
+        document.getElementById('st-descargas').textContent = d.totalDescargas;
+        document.getElementById('st-hoy').textContent       = d.descargasHoy;
+        document.getElementById('st-usuarios').textContent  = d.totalUsuarios;
+
+        // Top docs table
+        const tbody = document.getElementById('tabla-top-docs');
+        if (!d.topDocs.length) {
+            tbody.innerHTML = '<p class="text-muted small">Sin descargas registradas aún.</p>';
+            return;
+        }
+        tbody.innerHTML = `
+          <table class="table table-sm mb-0">
+            <thead><tr>
+              <th class="text-muted small fw-bold" style="font-size:.75rem;">DOCUMENTO</th>
+              <th class="text-muted small fw-bold text-end" style="font-size:.75rem;">DESCARGAS</th>
+            </tr></thead>
+            <tbody>
+              ${d.topDocs.map(r => `
+                <tr>
+                  <td class="small">${escHtml(r.titulo)}</td>
+                  <td class="text-end"><span class="badge bg-primary rounded-pill">${r.descargas}</span></td>
+                </tr>`).join('')}
+            </tbody>
+          </table>`;
+    } catch(err) { console.error(err); }
+}
+
+// ─────────────────────────────────────────────
+//  TABLA DOCUMENTOS
+// ─────────────────────────────────────────────
+async function cargarTablaDocumentos() {
+    const tbody = document.getElementById('body-documentos');
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted small">Cargando...</td></tr>';
+    try {
+        const res  = await fetch(`${API}/admin/documentos`, { headers: authHeaders() });
+        const json = await res.json();
+        if (!json.ok || !json.data.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted small">No hay documentos.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = json.data.map(doc => `
+          <tr>
+            <td class="ps-4">
+              <span class="fw-bold small">${escHtml(doc.titulo)}</span>
+              <br><span class="text-muted" style="font-size:.72rem;">${escHtml(doc.descripcion || '')}</span>
+            </td>
+            <td><span class="badge rounded-pill bg-light text-dark border small">${escHtml(doc.etapa_nombre)}</span></td>
+            <td>
+              ${doc.nombre_archivo
+                ? `<span class="text-success small"><i class="bi bi-check-circle me-1"></i>${escHtml(doc.nombre_archivo)}</span>`
+                : `<span class="text-muted small"><i class="bi bi-dash me-1"></i>Sin archivo</span>`}
+            </td>
+            <td>
+              <span class="badge rounded-pill ${doc.vigente ? 'badge-vigente' : 'badge-inactivo'}">
+                ${doc.vigente ? 'Vigente' : 'Inactivo'}
+              </span>
+            </td>
+            <td class="pe-4">
+              <button class="btn btn-sm btn-outline-primary rounded-3 me-1" onclick="editarDoc(${doc.id})" title="Editar">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger rounded-3" onclick="eliminarDoc(${doc.id}, '${escHtml(doc.titulo)}')" title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>`).join('');
+        // Guardar data para edición
+        window._docsData = json.data;
+    } catch(err) {
+        console.error(err);
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger small">Error al cargar documentos.</td></tr>';
+    }
+}
+
+// ─────────────────────────────────────────────
+//  MODAL DOCUMENTO
+// ─────────────────────────────────────────────
+let modalDocBS;
+function abrirModalNuevoDoc() {
+    document.getElementById('modal-doc-titulo').textContent = 'Nuevo Documento';
+    document.getElementById('doc-id').value          = '';
+    document.getElementById('doc-titulo').value      = '';
+    document.getElementById('doc-etapa').value       = '1';
+    document.getElementById('doc-descripcion').value = '';
+    document.getElementById('doc-tipo').value        = 'formato';
+    document.getElementById('doc-orden').value       = '1';
+    document.getElementById('doc-vigente').value     = 'true';
+    document.getElementById('doc-archivo').value     = '';
+    document.getElementById('doc-guia-archivo').value = '';
+    document.getElementById('modal-doc-error').classList.add('d-none');
+    modalDocBS = new bootstrap.Modal(document.getElementById('modalDocumento'));
+    modalDocBS.show();
+}
+
+function editarDoc(id) {
+    const doc = window._docsData?.find(d => d.id === id);
+    if (!doc) return;
+    document.getElementById('modal-doc-titulo').textContent = 'Editar Documento';
+    document.getElementById('doc-id').value          = doc.id;
+    document.getElementById('doc-titulo').value      = doc.titulo;
+    document.getElementById('doc-etapa').value       = doc.etapa_id;
+    document.getElementById('doc-descripcion').value = doc.descripcion || '';
+    document.getElementById('doc-tipo').value        = doc.tipo;
+    document.getElementById('doc-orden').value       = doc.orden;
+    document.getElementById('doc-vigente').value     = doc.vigente ? 'true' : 'false';
+    document.getElementById('doc-archivo').value     = '';
+    document.getElementById('doc-guia-archivo').value = '';
+    document.getElementById('modal-doc-error').classList.add('d-none');
+    modalDocBS = new bootstrap.Modal(document.getElementById('modalDocumento'));
+    modalDocBS.show();
+}
+
+async function guardarDocumento() {
+    const id       = document.getElementById('doc-id').value;
+    const spinner  = document.getElementById('spinner-doc');
+    const errEl    = document.getElementById('modal-doc-error');
+    const titulo   = document.getElementById('doc-titulo').value.trim();
+
+    if (!titulo) {
+        errEl.textContent = 'El título es requerido.';
+        errEl.classList.remove('d-none');
+        return;
+    }
+
+    const fd = new FormData();
+    fd.append('etapa_id',    document.getElementById('doc-etapa').value);
+    fd.append('titulo',      titulo);
+    fd.append('descripcion', document.getElementById('doc-descripcion').value);
+    fd.append('tipo',        document.getElementById('doc-tipo').value);
+    fd.append('orden',       document.getElementById('doc-orden').value);
+    fd.append('vigente',     document.getElementById('doc-vigente').value);
+    const arch = document.getElementById('doc-archivo').files[0];
+    const guia = document.getElementById('doc-guia-archivo').files[0];
+    if (arch) fd.append('archivo', arch);
+    if (guia) { fd.append('archivo_guia', guia); fd.append('tiene_guia', 'true'); }
+
+    const url    = id ? `${API}/admin/documentos/${id}` : `${API}/admin/documentos`;
+    const method = id ? 'PUT' : 'POST';
+
+    spinner.classList.remove('d-none');
+    errEl.classList.add('d-none');
+    document.getElementById('btn-guardar-doc').disabled = true;
+
+    try {
+        const res  = await fetch(url, { method, headers: authHeaders(), body: fd });
+        const json = await res.json();
+        if (!json.ok) {
+            errEl.textContent = json.mensaje;
+            errEl.classList.remove('d-none');
+        } else {
+            modalDocBS.hide();
+            cargarTablaDocumentos();
+            cargarEstadisticas();
+        }
+    } catch {
+        errEl.textContent = 'Error de conexión.';
+        errEl.classList.remove('d-none');
+    } finally {
+        spinner.classList.add('d-none');
+        document.getElementById('btn-guardar-doc').disabled = false;
+    }
+}
+
+async function eliminarDoc(id, titulo) {
+    if (!confirm(`¿Eliminar "${titulo}"?\n\nEsta acción borrará el archivo del servidor.`)) return;
+    try {
+        const res  = await fetch(`${API}/admin/documentos/${id}`, {
+            method: 'DELETE', headers: authHeaders()
+        });
+        const json = await res.json();
+        if (json.ok) { cargarTablaDocumentos(); cargarEstadisticas(); }
+        else alert('Error: ' + json.mensaje);
+    } catch { alert('Error de conexión.'); }
+}
+
+// ─────────────────────────────────────────────
+//  TABLA USUARIOS
+// ─────────────────────────────────────────────
+async function cargarTablaUsuarios() {
+    const tbody = document.getElementById('body-usuarios');
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted small">Cargando...</td></tr>';
+    try {
+        const res  = await fetch(`${API}/admin/usuarios`, { headers: authHeaders() });
+        const json = await res.json();
+        tbody.innerHTML = json.data.map(u => `
+          <tr>
+            <td class="ps-4 fw-bold small">${escHtml(u.nombre)}</td>
+            <td class="small text-muted">${escHtml(u.email)}</td>
+            <td><span class="badge rounded-pill ${u.rol === 'admin' ? 'bg-dark' : 'bg-secondary'}">${u.rol}</span></td>
+            <td><span class="badge rounded-pill ${u.activo ? 'badge-vigente' : 'badge-inactivo'}">${u.activo ? 'Activo' : 'Inactivo'}</span></td>
+            <td class="pe-4 small text-muted">${new Date(u.created_at).toLocaleDateString('es-MX')}</td>
+          </tr>`).join('');
+    } catch { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger small">Error.</td></tr>'; }
+}
+
+let modalUsrBS;
+function abrirModalNuevoUsuario() {
+    document.getElementById('usr-nombre').value   = '';
+    document.getElementById('usr-email').value    = '';
+    document.getElementById('usr-password').value = '';
+    document.getElementById('modal-usr-error').classList.add('d-none');
+    modalUsrBS = new bootstrap.Modal(document.getElementById('modalUsuario'));
+    modalUsrBS.show();
+}
+
+async function guardarUsuario() {
+    const errEl = document.getElementById('modal-usr-error');
+    const body  = {
+        nombre:   document.getElementById('usr-nombre').value.trim(),
+        email:    document.getElementById('usr-email').value.trim(),
+        password: document.getElementById('usr-password').value,
+        rol: 'admin'
+    };
+    if (!body.nombre || !body.email || !body.password) {
+        errEl.textContent = 'Todos los campos son requeridos.';
+        errEl.classList.remove('d-none'); return;
+    }
+    try {
+        const res  = await fetch(`${API}/admin/usuarios`, {
+            method: 'POST', headers: authHeadersJson(), body: JSON.stringify(body)
+        });
+        const json = await res.json();
+        if (!json.ok) { errEl.textContent = json.mensaje; errEl.classList.remove('d-none'); }
+        else { modalUsrBS.hide(); cargarTablaUsuarios(); }
+    } catch { errEl.textContent = 'Error de conexión.'; errEl.classList.remove('d-none'); }
+}
+
+// ─────────────────────────────────────────────
+//  UTILS
+// ─────────────────────────────────────────────
+function escHtml(str) {
+    return String(str || '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
