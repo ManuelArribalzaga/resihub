@@ -1,27 +1,20 @@
-// config/db.js — Conexión a MySQL con pool de conexiones
+// config/db.js — Conexión a PostgreSQL (Supabase)
 require('dotenv').config();
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
 
-const pool = mysql.createPool({
-  host:               process.env.DB_HOST     || 'localhost',
-  port:               parseInt(process.env.DB_PORT) || 3306,
-  user:               process.env.DB_USER     || 'root',
-  password:           process.env.DB_PASSWORD || '',
-  database:           process.env.DB_NAME     || 'resihub_db',
-  waitForConnections: true,
-  connectionLimit:    10,
-  queueLimit:         0,
-  charset:            'utf8mb4',
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 });
 
 // Verificar conexión al arrancar
 (async () => {
   try {
-    const conn = await pool.getConnection();
-    console.log('✅  MySQL conectado correctamente');
-    conn.release();
+    const client = await pool.connect();
+    console.log('✅  PostgreSQL (Supabase) conectado correctamente');
+    client.release();
   } catch (err) {
-    console.error('❌  Error al conectar con MySQL:', err.message);
+    console.error('❌  Error al conectar con PostgreSQL:', err.message);
     process.exit(1);
   }
 })();
