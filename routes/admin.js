@@ -7,9 +7,9 @@ const router  = express.Router();
 const { verificarToken, soloAdmin, adminOGestor } = require('../middleware/auth');
 const {
   listarDocumentos, crearDocumento, actualizarDocumento, eliminarDocumento,
-  listarEtapas, estadisticas, listarUsuarios, crearUsuario, eliminarUsuario
+  listarEtapas, estadisticas, listarUsuarios, crearUsuario, eliminarUsuario,
+  actividadReciente, descargasPorDia
 } = require('../controllers/adminController');
-
 // ─── MULTER ──────────────────────────────────────────────────
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'uploads')),
