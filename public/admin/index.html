@@ -488,8 +488,26 @@ async function verificarToken() {
 function cerrarSesion() {
     localStorage.removeItem('rh_token');
     token = '';
+    window._rolActual = null;
+
+    // Resetear UI al estado inicial
     document.getElementById('vista-login').classList.remove('d-none');
     document.getElementById('vista-dashboard').classList.add('d-none');
+
+    // Resetear badge de rol
+    const rolBadge = document.getElementById('sidebar-rol');
+    if (rolBadge) { rolBadge.textContent = ''; rolBadge.className = ''; }
+
+    // Volver a mostrar el link de Usuarios (por si era gestor)
+    const linkUsuarios = document.querySelector('[data-seccion="usuarios"]');
+    if (linkUsuarios) linkUsuarios.parentElement.style.display = '';
+
+    // Resetear textos
+    document.getElementById('sidebar-user').textContent = '';
+    document.getElementById('topbar-user').textContent  = '';
+
+    // Volver siempre al Dashboard al hacer logout
+    mostrarSeccion('dashboard');
 }
 
 function mostrarDashboard(usuario) {
