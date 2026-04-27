@@ -82,12 +82,12 @@
             <div class="mb-3">
                 <label class="form-label fw-bold small">Correo electrónico</label>
                 <input type="email" id="login-email" class="form-control rounded-3"
-                        placeholder="correo@itmina.edu.mx">
+                       placeholder="admin@itmina.edu.mx" value="admin@itmina.edu.mx">
             </div>
             <div class="mb-4">
                 <label class="form-label fw-bold small">Contraseña</label>
                 <input type="password" id="login-password" class="form-control rounded-3"
-                        placeholder="••••••••">
+                       placeholder="••••••••" value="Admin2026!">
             </div>
             <button id="btn-login" class="btn btn-primary w-100 fw-bold rounded-3 py-2"
                     style="background:var(--azul);border:none;">
@@ -136,6 +136,7 @@
         </ul>
         <div class="mt-auto px-1 pt-4">
             <p class="text-secondary small mb-0" id="sidebar-user"></p>
+            <span id="sidebar-rol" class="badge rounded-pill mt-1 small"></span>
         </div>
     </nav>
 
@@ -256,7 +257,7 @@
                 <button class="btn btn-primary rounded-3 fw-bold btn-sm px-4"
                         style="background:var(--azul);border:none;"
                         onclick="abrirModalNuevoUsuario()">
-                    <i class="bi bi-person-plus me-2"></i>Nuevo Admin
+                    <i class="bi bi-person-plus me-2"></i>Nuevo Usuario
                 </button>
             </div>
             <div class="card shadow-sm rounded-4">
@@ -388,6 +389,14 @@
                     <label class="form-label fw-bold small">Contraseña (mín. 8 caracteres)</label>
                     <input type="password" id="usr-password" class="form-control rounded-3">
                 </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">Rol</label>
+                    <select id="usr-rol" class="form-select rounded-3">
+                        <option value="gestor">📋 Gestor — puede subir y editar documentos</option>
+                        <option value="admin">👑 Administrador — acceso total</option>
+                    </select>
+                    <p class="text-muted small mt-1 mb-0">El gestor no puede eliminar documentos ni gestionar usuarios.</p>
+                </div>
             </div>
             <div class="modal-footer border-0 pt-0">
                 <button class="btn btn-outline-secondary rounded-3 btn-sm px-4"
@@ -487,7 +496,28 @@ function mostrarDashboard(usuario) {
     document.getElementById('vista-login').classList.add('d-none');
     document.getElementById('vista-dashboard').classList.remove('d-none');
     document.getElementById('sidebar-user').textContent = usuario.nombre;
-    document.getElementById('topbar-user').textContent  = usuario.email;
+    document.getElementById('topbar-user').textContent  = usuario.email + ' · ' + (usuario.rol === 'admin' ? '👑 Admin' : '📋 Gestor');
+
+    // Mostrar badge de rol en sidebar
+    const rolBadge = document.getElementById('sidebar-rol');
+    if (usuario.rol === 'admin') {
+        rolBadge.textContent = '👑 Administrador';
+        rolBadge.className = 'badge rounded-pill mt-1 small bg-warning text-dark';
+    } else {
+        rolBadge.textContent = '📋 Gestor';
+        rolBadge.className = 'badge rounded-pill mt-1 small bg-info text-dark';
+    }
+
+    // Ocultar sección Usuarios si es gestor
+    const linkUsuarios = document.querySelector('[data-seccion="usuarios"]');
+    const secUsuarios  = document.getElementById('sec-usuarios');
+    if (usuario.rol !== 'admin') {
+        if (linkUsuarios) linkUsuarios.parentElement.style.display = 'none';
+    }
+
+    // Ocultar botón Eliminar en documentos si es gestor
+    window._rolActual = usuario.rol;
+
     cargarEstadisticas();
     cargarTablaDocumentos();
 }
@@ -583,9 +613,7 @@ async function cargarTablaDocumentos() {
               <button class="btn btn-sm btn-outline-primary rounded-3 me-1" onclick="editarDoc(${doc.id})" title="Editar">
                 <i class="bi bi-pencil"></i>
               </button>
-              <button class="btn btn-sm btn-outline-danger rounded-3" onclick="eliminarDoc(${doc.id}, '${escHtml(doc.titulo)}')" title="Eliminar">
-                <i class="bi bi-trash"></i>
-              </button>
+              ${window._rolActual === 'admin' ? `<button class="btn btn-sm btn-outline-danger rounded-3" onclick="eliminarDoc(${doc.id}, '${escHtml(doc.titulo)}')" title="Eliminar"><i class="bi bi-trash"></i></button>` : ''}
             </td>
           </tr>`).join('');
         // Guardar data para edición
@@ -710,7 +738,7 @@ async function cargarTablaUsuarios() {
           <tr>
             <td class="ps-4 fw-bold small">${escHtml(u.nombre)}</td>
             <td class="small text-muted">${escHtml(u.email)}</td>
-            <td><span class="badge rounded-pill ${u.rol === 'admin' ? 'bg-dark' : 'bg-secondary'}">${u.rol}</span></td>
+            <td><span class="badge rounded-pill ${u.rol === 'admin' ? 'bg-warning text-dark' : 'bg-info text-dark'}">${u.rol === 'admin' ? '👑 Admin' : '📋 Gestor'}</span></td>
             <td><span class="badge rounded-pill ${u.activo ? 'badge-vigente' : 'badge-inactivo'}">${u.activo ? 'Activo' : 'Inactivo'}</span></td>
             <td class="pe-4 small text-muted">${new Date(u.created_at).toLocaleDateString('es-MX')}</td>
           </tr>`).join('');
@@ -733,7 +761,7 @@ async function guardarUsuario() {
         nombre:   document.getElementById('usr-nombre').value.trim(),
         email:    document.getElementById('usr-email').value.trim(),
         password: document.getElementById('usr-password').value,
-        rol: 'admin'
+        rol:      document.getElementById('usr-rol').value
     };
     if (!body.nombre || !body.email || !body.password) {
         errEl.textContent = 'Todos los campos son requeridos.';

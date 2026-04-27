@@ -1,4 +1,4 @@
-// controllers/adminController.js
+// controllers/adminController.js — Con eliminarUsuario añadido
 const bcrypt = require('bcryptjs');
 const path   = require('path');
 const fs     = require('fs');
@@ -32,8 +32,8 @@ async function crearDocumento(req, res) {
       `INSERT INTO documentos
        (etapa_id, titulo, descripcion, nombre_archivo, tipo, tiene_guia, nombre_guia, orden)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`,
-      [etapa_id, titulo, descripcion || null, archivo, tipo || 'formato',
-       tiene_guia === 'true', archivoGuia, orden || 1]
+      [etapa_id, titulo, descripcion || null, archivo,
+       tipo || 'formato', tiene_guia === 'true', archivoGuia, orden || 1]
     );
     return res.status(201).json({ ok: true, mensaje: 'Documento creado', id: rows[0].id });
   } catch (err) {
@@ -53,15 +53,15 @@ async function actualizarDocumento(req, res) {
     const valores = [];
     let   idx     = 1;
 
-    if (titulo      !== undefined) { campos.push(`titulo = $${idx++}`);           valores.push(titulo); }
-    if (descripcion !== undefined) { campos.push(`descripcion = $${idx++}`);      valores.push(descripcion); }
-    if (tipo        !== undefined) { campos.push(`tipo = $${idx++}`);             valores.push(tipo); }
-    if (tiene_guia  !== undefined) { campos.push(`tiene_guia = $${idx++}`);      valores.push(tiene_guia === 'true'); }
-    if (vigente     !== undefined) { campos.push(`vigente = $${idx++}`);         valores.push(vigente === 'true'); }
-    if (orden       !== undefined) { campos.push(`orden = $${idx++}`);           valores.push(orden); }
-    if (etapa_id    !== undefined) { campos.push(`etapa_id = $${idx++}`);        valores.push(etapa_id); }
-    if (archivo)                   { campos.push(`nombre_archivo = $${idx++}`);  valores.push(archivo); }
-    if (archivoGuia)               { campos.push(`nombre_guia = $${idx++}`);     valores.push(archivoGuia); }
+    if (titulo      !== undefined) { campos.push(`titulo = $${idx++}`);          valores.push(titulo); }
+    if (descripcion !== undefined) { campos.push(`descripcion = $${idx++}`);     valores.push(descripcion); }
+    if (tipo        !== undefined) { campos.push(`tipo = $${idx++}`);            valores.push(tipo); }
+    if (tiene_guia  !== undefined) { campos.push(`tiene_guia = $${idx++}`);     valores.push(tiene_guia === 'true'); }
+    if (vigente     !== undefined) { campos.push(`vigente = $${idx++}`);        valores.push(vigente === 'true'); }
+    if (orden       !== undefined) { campos.push(`orden = $${idx++}`);          valores.push(orden); }
+    if (etapa_id    !== undefined) { campos.push(`etapa_id = $${idx++}`);       valores.push(etapa_id); }
+    if (archivo)                   { campos.push(`nombre_archivo = $${idx++}`); valores.push(archivo); }
+    if (archivoGuia)               { campos.push(`nombre_guia = $${idx++}`);    valores.push(archivoGuia); }
     campos.push(`updated_at = NOW()`);
 
     if (campos.length === 1)
@@ -79,7 +79,9 @@ async function actualizarDocumento(req, res) {
 async function eliminarDocumento(req, res) {
   const { id } = req.params;
   try {
-    const { rows } = await db.query('SELECT nombre_archivo, nombre_guia FROM documentos WHERE id = $1', [id]);
+    const { rows } = await db.query(
+      'SELECT nombre_archivo, nombre_guia FROM documentos WHERE id = $1', [id]
+    );
     if (rows.length === 0)
       return res.status(404).json({ ok: false, mensaje: 'No encontrado' });
 
@@ -128,7 +130,7 @@ async function estadisticas(req, res) {
     const { rows: porEtapa } = await db.query(
       `SELECT e.nombre, COUNT(desc2.id) AS descargas
        FROM etapas e
-       LEFT JOIN documentos d   ON e.id = d.etapa_id
+       LEFT JOIN documentos d    ON e.id = d.etapa_id
        LEFT JOIN descargas desc2 ON d.id = desc2.documento_id
        GROUP BY e.id, e.nombre ORDER BY e.orden`
     );
@@ -167,11 +169,15 @@ async function crearUsuario(req, res) {
   if (!nombre || !email || !password)
     return res.status(400).json({ ok: false, mensaje: 'Nombre, email y contraseña son requeridos' });
 
+  // Validar que el rol sea válido
+  const rolesValidos = ['admin', 'gestor'];
+  const rolFinal = rolesValidos.includes(rol) ? rol : 'gestor';
+
   try {
     const hash = await bcrypt.hash(password, 10);
     await db.query(
       'INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES ($1,$2,$3,$4)',
-      [nombre, email.toLowerCase(), hash, rol || 'admin']
+      [nombre, email.toLowerCase(), hash, rolFinal]
     );
     return res.status(201).json({ ok: true, mensaje: 'Usuario creado correctamente' });
   } catch (err) {
@@ -181,7 +187,27 @@ async function crearUsuario(req, res) {
   }
 }
 
+async function eliminarUsuario(req, res) {
+  const { id } = req.params;
+
+  // Evitar que el admin se elimine a sí mismo
+  if (parseInt(id) === req.usuario.id)
+    return res.status(400).json({ ok: false, mensaje: 'No puedes eliminarte a ti mismo' });
+
+  try {
+    const { rows } = await db.query('SELECT id FROM usuarios WHERE id = $1', [id]);
+    if (rows.length === 0)
+      return res.status(404).json({ ok: false, mensaje: 'Usuario no encontrado' });
+
+    await db.query('DELETE FROM usuarios WHERE id = $1', [id]);
+    return res.json({ ok: true, mensaje: 'Usuario eliminado correctamente' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ ok: false, mensaje: 'Error al eliminar usuario' });
+  }
+}
+
 module.exports = {
   listarDocumentos, crearDocumento, actualizarDocumento, eliminarDocumento,
-  listarEtapas, estadisticas, listarUsuarios, crearUsuario
+  listarEtapas, estadisticas, listarUsuarios, crearUsuario, eliminarUsuario
 };
