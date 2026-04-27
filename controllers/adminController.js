@@ -208,6 +208,39 @@ async function eliminarUsuario(req, res) {
 }
 
 module.exports = {
+  actividadReciente, descargasPorDia,
   listarDocumentos, crearDocumento, actualizarDocumento, eliminarDocumento,
   listarEtapas, estadisticas, listarUsuarios, crearUsuario, eliminarUsuario
 };
+
+// ─── ACTIVIDAD RECIENTE ───────────────────────────────────────
+
+async function actividadReciente(req, res) {
+  try {
+    const { rows } = await db.query(
+      `SELECT d.titulo, desc2.fecha, desc2.ip_origen
+       FROM descargas desc2
+       JOIN documentos d ON d.id = desc2.documento_id
+       ORDER BY desc2.fecha DESC LIMIT 10`
+    );
+    return res.json({ ok: true, data: rows });
+  } catch (err) {
+    return res.status(500).json({ ok: false, mensaje: 'Error' });
+  }
+}
+
+// ─── DATOS PARA GRÁFICA (últimos 7 días) ─────────────────────
+
+async function descargasPorDia(req, res) {
+  try {
+    const { rows } = await db.query(
+      `SELECT fecha::date AS dia, COUNT(*) AS total
+       FROM descargas
+       WHERE fecha >= NOW() - INTERVAL '7 days'
+       GROUP BY dia ORDER BY dia`
+    );
+    return res.json({ ok: true, data: rows });
+  } catch (err) {
+    return res.status(500).json({ ok: false, mensaje: 'Error' });
+  }
+}

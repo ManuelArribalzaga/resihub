@@ -54,4 +54,12 @@ router.get('/usuarios',     soloAdmin, listarUsuarios);
 router.post('/usuarios',    soloAdmin, crearUsuario);
 router.delete('/usuarios/:id', soloAdmin, eliminarUsuario);
 
+
+// ─── ACTIVIDAD Y GRÁFICAS (admin y gestor) ───────────────────
+router.get('/actividad',        adminOGestor, actividadReciente);
+router.get('/descargas-por-dia', adminOGestor, descargasPorDia);
+
 module.exports = router;
+
+// ─── NUEVAS RUTAS ─────────────────────────────────────────────
+// (agregar antes del module.exports)

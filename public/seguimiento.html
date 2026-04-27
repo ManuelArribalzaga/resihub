@@ -3,96 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Etapa 2: Seguimiento - ResiHub</title>
+    <title>Etapa 2: Seguimiento — ResiHub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/estilos.css">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
+        .navbar { backdrop-filter: blur(12px); background: rgba(255,255,255,0.95) !important; }
+        .page-header {
+            background: linear-gradient(135deg, #0f172a 0%, #064e3b 50%, #059669 100%);
+            position: relative; overflow: hidden;
+        }
+        .page-header::before {
+            content: ''; position: absolute;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 65%);
+            top: -150px; right: -150px; border-radius: 50%;
+        }
+        .page-header-content { position: relative; z-index: 1; padding: 3rem 0; }
+        .step-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 100px; padding: 0.35rem 1rem;
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em;
+            text-transform: uppercase; color: rgba(255,255,255,0.85); margin-bottom: 1rem;
+        }
+        .page-title { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; letter-spacing: -0.02em; }
+        .stepper { display: flex; align-items: center; }
+        .step-dot { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: 600; }
+        .step-dot .dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+        .step-dot.done .dot { background: rgba(255,255,255,0.9); color: #059669; }
+        .step-dot.done .label { color: rgba(255,255,255,0.7); }
+        .step-dot.active .dot { background: white; color: #059669; }
+        .step-dot.active .label { color: white; }
+        .step-dot.inactive .dot { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
+        .step-dot.inactive .label { color: rgba(255,255,255,0.45); }
+        .step-line { flex: 1; height: 1px; background: rgba(255,255,255,0.2); margin: 0 0.75rem; max-width: 60px; }
+        .doc-card { background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 1.5rem; transition: transform .3s, box-shadow .3s, border-color .3s; height: 100%; display: flex; flex-direction: column; }
+        .doc-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,0.08); border-color: #059669; }
+        .doc-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 1rem; }
+        .doc-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
+        .doc-desc { font-size: 0.8rem; color: #64748b; line-height: 1.6; flex: 1; margin-bottom: 1.25rem; }
+        .btn-download { background: #0f172a; color: white; border: none; border-radius: 10px; padding: 0.6rem 1rem; font-size: 0.82rem; font-weight: 700; transition: background .2s, transform .2s; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .btn-download:hover { background: #1e293b; color: white; transform: translateY(-1px); }
+        .btn-disabled { background: #f1f5f9; color: #94a3b8; border: none; border-radius: 10px; padding: 0.6rem 1rem; font-size: 0.82rem; font-weight: 700; cursor: not-allowed; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .loading-state { text-align: center; padding: 3rem; color: #64748b; }
+        .alert-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; padding: 1.25rem 1.5rem; }
+        .footer-dark { background: #0f172a; }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up { animation: fadeInUp .5s ease both; }
+    </style>
 </head>
-<body class="bg-light">
+<body>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
+    <nav class="navbar navbar-expand-lg sticky-top shadow-sm">
         <div class="container d-flex justify-content-between align-items-center py-2">
-            <a class="navbar-brand d-flex align-items-center fw-bold" href="/">
-                <img src="/img/ITMina.png" alt="Logo ITMina" height="50" class="me-2">
-                <span class="fs-5 text-dark">TECNM - RESIDENCIAS</span>
+            <a class="navbar-brand d-flex align-items-center fw-bold text-decoration-none gap-2" href="/">
+                <img src="/img/ITMina.png" alt="Logo ITMina" height="46">
+                <span class="fs-6 fw-bold text-dark">TECNM · RESIDENCIAS</span>
             </a>
-            <div class="navbar-nav gap-2">
-                <a class="nav-link fw-bold" href="/">Inicio</a>
-                <a class="nav-link fw-bold" href="/solicitud.html">Solicitud</a>
-                <a class="nav-link active bg-light rounded-pill px-3 text-primary fw-bold" href="/seguimiento.html">Seguimiento</a>
-                <a class="nav-link fw-bold" href="/liberacion.html">Liberación</a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navMain">
+                <div class="navbar-nav gap-1 align-items-center">
+                    <a class="nav-link fw-semibold px-3" href="/">Inicio</a>
+                    <a class="nav-link fw-semibold px-3" href="/solicitud.html">Solicitud</a>
+                    <a class="nav-link fw-semibold px-3 py-2 rounded-3" style="background:#f0fdf4;color:#059669;" href="/seguimiento.html">Seguimiento</a>
+                    <a class="nav-link fw-semibold px-3" href="/liberacion.html">Liberación</a>
+                </div>
             </div>
         </div>
     </nav>
 
-    <header class="bg-white border-bottom py-5">
-        <div class="container text-center">
-            <div class="icon-box bg-gray-light mx-auto mb-3" style="width:60px;height:60px;">
-                <i class="bi bi-check-circle text-muted fs-2"></i>
+    <header class="page-header">
+        <div class="container page-header-content">
+            <div class="stepper mb-4">
+                <div class="step-dot done">
+                    <div class="dot"><i class="bi bi-check" style="font-size:0.8rem;"></i></div>
+                    <span class="label d-none d-sm-inline">Solicitud</span>
+                </div>
+                <div class="step-line"></div>
+                <div class="step-dot active">
+                    <div class="dot">2</div>
+                    <span class="label d-none d-sm-inline">Seguimiento</span>
+                </div>
+                <div class="step-line"></div>
+                <div class="step-dot inactive">
+                    <div class="dot">3</div>
+                    <span class="label d-none d-sm-inline">Liberación</span>
+                </div>
             </div>
-            <h1 class="fw-extrabold display-5 mb-2">Etapa 2: Seguimiento</h1>
-            <p class="text-muted mx-auto small" style="max-width:700px;">
-                Entrega tus reportes bimestrales y mantén tu expediente al día para asegurar
-                el avance de tu residencia profesional.
+            <div class="step-badge"><i class="bi bi-check-circle-fill"></i> Etapa 02 de 03</div>
+            <h1 class="page-title text-white mb-3 fade-up">Seguimiento de Residencia</h1>
+            <p class="fade-up" style="color:rgba(255,255,255,0.65);font-size:1rem;max-width:560px;line-height:1.7;">
+                Entrega tus reportes bimestrales y mantén tu expediente al día para asegurar el avance correcto de tu residencia profesional.
             </p>
         </div>
     </header>
 
     <section class="container py-5">
         <div class="row g-4" id="documentos-seguimiento">
-            <!-- Los documentos se cargan dinámicamente desde la API -->
+            <div class="col-12 loading-state">
+                <div class="spinner-border mb-3" style="width:2rem;height:2rem;color:#059669;"></div>
+                <p class="small">Cargando documentos...</p>
+            </div>
         </div>
     </section>
 
-    <section class="container mb-5 text-start">
-        <div class="p-4 rounded-4" style="background-color:#f0f7ff;border:1px solid #dbeafe;">
-            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-exclamation-circle me-2"></i>¡Importante!</h6>
-            <p class="text-muted mb-3" style="font-size:0.85rem;">
-                Los reportes deben ser entregados en tiempo y forma. Un retraso mayor a 5 días
-                hábiles puede ameritar una sanción en tu calificación final.
-            </p>
-            <ul class="text-muted small mb-0 d-grid gap-2">
-                <li>✔ Firma asesor interno</li>
-                <li>✔ Firma asesor externo</li>
-                <li>✔ Sello de la empresa</li>
-            </ul>
+    <section class="container mb-5">
+        <div class="alert-box">
+            <div class="d-flex gap-3 align-items-start">
+                <div style="width:40px;height:40px;background:#059669;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i class="bi bi-exclamation-circle-fill text-white"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-2" style="color:#059669;">¡Importante! Requisitos de entrega</h6>
+                    <p class="text-muted small mb-2">Los reportes deben entregarse en tiempo y forma. Un retraso mayor a 5 días hábiles puede afectar tu calificación final.</p>
+                    <div class="d-flex flex-column gap-1">
+                        <div class="d-flex align-items-center gap-2 small text-muted">
+                            <i class="bi bi-check-circle-fill" style="color:#059669;font-size:0.8rem;"></i>
+                            Firma del asesor interno
+                        </div>
+                        <div class="d-flex align-items-center gap-2 small text-muted">
+                            <i class="bi bi-check-circle-fill" style="color:#059669;font-size:0.8rem;"></i>
+                            Firma del asesor externo
+                        </div>
+                        <div class="d-flex align-items-center gap-2 small text-muted">
+                            <i class="bi bi-check-circle-fill" style="color:#059669;font-size:0.8rem;"></i>
+                            Sello de la empresa receptora
+                        </div>
+                    </div>
+                    <a href="/liberacion.html" class="btn btn-sm rounded-pill px-4 mt-3 fw-bold" style="background:#059669;border:none;color:white;font-size:0.8rem;">
+                        Continuar a Liberación <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
         </div>
     </section>
 
     <footer class="footer-dark text-white pt-5 pb-3">
         <div class="container">
-            <div class="row g-4 border-bottom border-white-10 pb-4 mb-3 text-start">
+            <div class="row g-4 pb-4 mb-3" style="border-bottom:1px solid rgba(255,255,255,0.08);">
                 <div class="col-md-5">
-                    <h5 class="fw-bold mb-3 d-flex align-items-center">
-                        <i class="bi bi-mortarboard-fill me-2"></i>TECNM - RES
-                    </h5>
-                    <p class="small text-secondary">Plataforma oficial del Instituto Tecnológico de Minatitlán.</p>
+                    <h5 class="fw-bold mb-2"><i class="bi bi-mortarboard-fill me-2"></i>TECNM · RES</h5>
+                    <p class="small mb-0" style="color:#64748b;">Plataforma oficial del Instituto Tecnológico de Minatitlán.</p>
                 </div>
                 <div class="col-md-3">
-                    <h6 class="fw-bold mb-3 small">Enlaces Rápidos</h6>
-                    <ul class="list-unstyled small text-secondary">
-                        <li class="mb-2"><a href="/solicitud.html" class="text-secondary text-decoration-none">Solicitud de Residencia</a></li>
-                        <li class="mb-2"><a href="/seguimiento.html" class="text-secondary text-decoration-none">Formatos de Seguimiento</a></li>
-                        <li><a href="/liberacion.html" class="text-secondary text-decoration-none">Proceso de Liberación</a></li>
+                    <h6 class="fw-bold mb-3 small">Etapas</h6>
+                    <ul class="list-unstyled small mb-0" style="color:#64748b;">
+                        <li class="mb-2"><a href="/solicitud.html" class="text-decoration-none" style="color:#64748b;">Solicitud</a></li>
+                        <li class="mb-2"><a href="/seguimiento.html" class="text-decoration-none" style="color:#64748b;">Seguimiento</a></li>
+                        <li><a href="/liberacion.html" class="text-decoration-none" style="color:#64748b;">Liberación</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4">
                     <h6 class="fw-bold mb-3 small">Contacto</h6>
-                    <p class="small text-secondary mb-1"><i class="bi bi-envelope me-2"></i>gestion.tecnologica@itmina.edu.mx</p>
-                    <p class="small text-secondary"><i class="bi bi-geo-alt me-2"></i>TecNM Campus Minatitlán</p>
+                    <p class="small mb-2" style="color:#64748b;"><i class="bi bi-envelope me-2"></i>gestion.tecnologica@itmina.edu.mx</p>
+                    <p class="small mb-0" style="color:#64748b;"><i class="bi bi-geo-alt me-2"></i>TecNM Campus Minatitlán</p>
                 </div>
             </div>
-            <div class="text-center small text-secondary">© 2026 ResiHub - TecNM / ITMina</div>
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <p class="small mb-0" style="color:#475569;">© 2026 ResiHub · TecNM / ITMina</p>
+                <a href="/admin/" class="text-decoration-none" style="color:rgba(255,255,255,0.12);font-size:0.75rem;"><i class="bi bi-shield-lock"></i></a>
+            </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/api.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            cargarDocumentos(2, 'documentos-seguimiento');
-        });
+        document.addEventListener('DOMContentLoaded', () => cargarDocumentos(2, 'documentos-seguimiento'));
     </script>
 </body>
 </html>

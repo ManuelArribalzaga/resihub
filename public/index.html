@@ -7,214 +7,480 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/estilos.css">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* ── NAVBAR ── */
+        .navbar { backdrop-filter: blur(12px); background: rgba(255,255,255,0.95) !important; }
+
+        /* ── HERO ── */
+        .hero-section {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 45%, #1d4ed8 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 65%);
+            top: -200px; right: -200px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(29,78,216,0.3) 0%, transparent 65%);
+            bottom: -100px; left: -100px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(8px);
+            border-radius: 100px;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: rgba(255,255,255,0.9);
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+        .hero-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+        }
+        .hero-subtitle { color: rgba(255,255,255,0.65); font-size: 1.05rem; line-height: 1.7; }
+        .btn-hero-primary {
+            background: white;
+            color: #1d4ed8;
+            border: none;
+            border-radius: 100px;
+            font-weight: 700;
+            padding: 0.75rem 1.75rem;
+            font-size: 0.95rem;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); color: #1d4ed8; }
+        .btn-hero-outline {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 100px;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.75rem;
+            font-size: 0.95rem;
+            transition: all .2s;
+        }
+        .btn-hero-outline:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.6); color: white; }
+
+        /* ── STATS BAR ── */
+        .stats-bar { background: #1d4ed8; }
+        .stat-item { text-align: center; padding: 0.875rem 0; }
+        .stat-num { font-size: 1.5rem; font-weight: 800; color: white; line-height: 1; }
+        .stat-lbl { font-size: 0.72rem; color: rgba(255,255,255,0.65); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem; }
+        .stat-divider { width: 1px; background: rgba(255,255,255,0.15); }
+
+        /* ── STEPPER ── */
+        .stepper-section { background: white; }
+        .step-card {
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            padding: 1.75rem;
+            transition: transform .3s, box-shadow .3s, border-color .3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .step-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); border-color: #1d4ed8; color: inherit; }
+        .step-number {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+        }
+        .step-icon {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 1.25rem;
+        }
+        .step-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .step-desc { font-size: 0.85rem; color: #64748b; line-height: 1.6; margin-bottom: 1.25rem; }
+        .step-link { font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 0.4rem; }
+
+        /* ── BUSCADOR ── */
+        .search-section { background: #f8fafc; }
+        .search-box {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 0.875rem 1.25rem 0.875rem 3rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1rem;
+            width: 100%;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .search-box:focus { border-color: #1d4ed8; box-shadow: 0 0 0 4px rgba(29,78,216,0.08); outline: none; }
+        .search-wrapper { position: relative; max-width: 600px; margin: 0 auto; }
+        .search-wrapper .bi-search { position: absolute; left: 1.1rem; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.1rem; }
+
+        /* ── FEATURES ── */
+        .feature-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        /* ── CTA ── */
+        .cta-section {
+            background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            top: -100px; right: -100px;
+            border-radius: 50%;
+        }
+
+        /* ── FOOTER ── */
+        .footer-dark { background: #0f172a; }
+
+        /* ── ANIMATIONS ── */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-up { animation: fadeInUp .6s ease both; }
+        .fade-up-2 { animation: fadeInUp .6s ease .15s both; }
+        .fade-up-3 { animation: fadeInUp .6s ease .3s both; }
+    </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg sticky-top shadow-sm">
         <div class="container d-flex justify-content-between align-items-center py-2">
-            <a class="navbar-brand d-flex align-items-center fw-bold" href="/">
-                <img src="/img/ITMina.png" alt="Logo ITMina" height="50" class="me-2">
-                <span class="fs-5 text-dark">TECNM - RESIDENCIAS</span>
+            <a class="navbar-brand d-flex align-items-center fw-bold text-decoration-none gap-2" href="/">
+                <img src="/img/ITMina.png" alt="Logo ITMina" height="46">
+                <span class="fs-6 fw-bold text-dark">TECNM · RESIDENCIAS</span>
             </a>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <div class="navbar-nav gap-2">
-                    <a class="nav-link active bg-light rounded-pill px-3 text-primary fw-bold" href="/">Inicio</a>
-                    <a class="nav-link fw-bold" href="/solicitud.html">Solicitud</a>
-                    <a class="nav-link fw-bold" href="/seguimiento.html">Seguimiento</a>
-                    <a class="nav-link fw-bold" href="/liberacion.html">Liberación</a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navMain">
+                <div class="navbar-nav gap-1 align-items-center">
+                    <a class="nav-link fw-semibold px-3 py-2 rounded-3" style="background:#eff6ff;color:#1d4ed8;" href="/">Inicio</a>
+                    <a class="nav-link fw-semibold px-3" href="/solicitud.html">Solicitud</a>
+                    <a class="nav-link fw-semibold px-3" href="/seguimiento.html">Seguimiento</a>
+                    <a class="nav-link fw-semibold px-3" href="/liberacion.html">Liberación</a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <header class="hero-section text-white text-start">
-        <div class="container py-5">
-            <div class="row py-5 align-items-center">
+    <!-- HERO -->
+    <header class="hero-section py-5">
+        <div class="container py-5" style="position:relative;z-index:1;">
+            <div class="row align-items-center py-3">
                 <div class="col-lg-7">
-                    <span class="badge bg-white bg-opacity-10 text-white fw-bold text-uppercase mb-3 rounded-pill px-3 py-2">
+                    <div class="hero-badge fade-up">
+                        <i class="bi bi-mortarboard-fill"></i>
                         Gestión de Residencias Profesionales
-                    </span>
-                    <h1 class="display-3 fw-extrabold mb-4">Tu camino hacia la titulación comienza aquí</h1>
-                    <p class="lead mb-5 text-white-75">
-                        ResiHub centraliza todos los trámites, formatos y guías que necesitas para tu residencia
-                        profesional en el Tecnológico de Minatitlán. Sin confusiones, sin retrasos.
+                    </div>
+                    <h1 class="hero-title text-white mb-4 fade-up-2">
+                        Tu camino hacia<br>
+                        <span style="background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">la titulación</span><br>
+                        comienza aquí
+                    </h1>
+                    <p class="hero-subtitle mb-5 fade-up-3">
+                        ResiHub centraliza todos los formatos, guías y trámites que necesitas
+                        para tu residencia profesional en el TecNM Campus Minatitlán.
                     </p>
-                    <div class="d-flex gap-3">
-                        <a href="#proceso" class="btn btn-light btn-lg px-4 fw-bold rounded-pill text-primary shadow">
-                            Iniciar Trámite →
+                    <div class="d-flex flex-wrap gap-3 fade-up-3">
+                        <a href="#proceso" class="btn-hero-primary">
+                            Iniciar trámite <i class="bi bi-arrow-right ms-1"></i>
                         </a>
-                        <a href="/solicitud.html" class="btn btn-outline-light btn-lg px-4 rounded-pill">
-                            Ver Requisitos
+                        <a href="/solicitud.html" class="btn-hero-outline">
+                            Ver requisitos
                         </a>
+                    </div>
+                </div>
+                <div class="col-lg-5 mt-5 mt-lg-0 d-flex justify-content-center">
+                    <div style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:24px;padding:1.5rem;max-width:320px;backdrop-filter:blur(12px);">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div style="width:10px;height:10px;background:#22c55e;border-radius:50%;box-shadow:0 0 6px #22c55e;"></div>
+                            <span style="color:rgba(255,255,255,0.6);font-size:0.8rem;">Sistema activo · Supabase + Render</span>
+                        </div>
+                        <div class="d-flex flex-column gap-2">
+                            <div style="background:rgba(255,255,255,0.07);border-radius:12px;padding:0.75rem 1rem;display:flex;align-items:center;gap:0.75rem;">
+                                <i class="bi bi-file-earmark-check-fill" style="color:#60a5fa;"></i>
+                                <span style="color:rgba(255,255,255,0.85);font-size:0.85rem;font-weight:600;">9 formatos oficiales disponibles</span>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.07);border-radius:12px;padding:0.75rem 1rem;display:flex;align-items:center;gap:0.75rem;">
+                                <i class="bi bi-shield-check-fill" style="color:#a78bfa;"></i>
+                                <span style="color:rgba(255,255,255,0.85);font-size:0.85rem;font-weight:600;">Documentación oficial vigente</span>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.07);border-radius:12px;padding:0.75rem 1rem;display:flex;align-items:center;gap:0.75rem;">
+                                <i class="bi bi-phone-fill" style="color:#34d399;"></i>
+                                <span style="color:rgba(255,255,255,0.85);font-size:0.85rem;font-weight:600;">Disponible en cualquier dispositivo</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Estadísticas dinámicas -->
-    <section class="bg-primary py-3">
+    <!-- STATS BAR -->
+    <div class="stats-bar">
         <div class="container">
-            <div class="row text-white text-center g-2" id="stats-bar">
-                <div class="col-4">
-                    <div class="fw-bold fs-4" id="stat-docs">—</div>
-                    <div class="small opacity-75">Documentos disponibles</div>
+            <div class="d-flex justify-content-center align-items-stretch">
+                <div class="stat-item px-4 flex-fill">
+                    <div class="stat-num" id="stat-docs">9</div>
+                    <div class="stat-lbl">Documentos disponibles</div>
                 </div>
-                <div class="col-4">
-                    <div class="fw-bold fs-4" id="stat-descargas">—</div>
-                    <div class="small opacity-75">Descargas totales</div>
+                <div class="stat-divider my-2"></div>
+                <div class="stat-item px-4 flex-fill">
+                    <div class="stat-num" id="stat-descargas">0</div>
+                    <div class="stat-lbl">Descargas totales</div>
                 </div>
-                <div class="col-4">
-                    <div class="fw-bold fs-4">3</div>
-                    <div class="small opacity-75">Etapas del proceso</div>
+                <div class="stat-divider my-2"></div>
+                <div class="stat-item px-4 flex-fill">
+                    <div class="stat-num">3</div>
+                    <div class="stat-lbl">Etapas del proceso</div>
+                </div>
+                <div class="stat-divider my-2 d-none d-md-block"></div>
+                <div class="stat-item px-4 flex-fill d-none d-md-block">
+                    <div class="stat-num">24/7</div>
+                    <div class="stat-lbl">Disponibilidad</div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- BUSCADOR -->
+    <section class="search-section py-4">
+        <div class="container">
+            <div class="search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" class="search-box" id="buscador-global" placeholder="Busca un documento, formato o guía..." oninput="buscarDocumento(this.value)">
+            </div>
+            <div id="resultados-busqueda" class="mt-3" style="max-width:600px;margin:0 auto;"></div>
+        </div>
     </section>
 
-    <section id="proceso" class="py-5 bg-white">
-        <div class="container text-center py-5">
-            <h2 class="fw-bold mb-3 display-6">Tu proceso paso a paso</h2>
-            <p class="text-muted mb-5 mx-auto" style="max-width:600px;">
-                Hemos simplificado la gestión administrativa en tres etapas claras.
-            </p>
+    <!-- PROCESO PASO A PASO -->
+    <section id="proceso" class="stepper-section py-5">
+        <div class="container py-4">
+            <div class="text-center mb-5">
+                <span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.35rem 1rem;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Proceso completo</span>
+                <h2 class="fw-bold mt-3 mb-2" style="font-size:clamp(1.6rem,4vw,2.2rem);letter-spacing:-0.02em;">Tu proceso paso a paso</h2>
+                <p class="text-muted mx-auto" style="max-width:520px;">Tres etapas claras. Toda la documentación centralizada en un solo lugar.</p>
+            </div>
+
             <div class="row g-4 justify-content-center">
                 <div class="col-md-4">
-                    <div class="card h-100 border-step-blue p-4 text-start card-custom shadow-sm">
-                        <div class="icon-box bg-blue-light mb-4">
-                            <i class="bi bi-file-earmark-text text-primary fs-3"></i>
+                    <a href="/solicitud.html" class="step-card">
+                        <div class="step-number">Etapa 01</div>
+                        <div class="step-icon" style="background:#eff6ff;color:#1d4ed8;">
+                            <i class="bi bi-file-earmark-text-fill"></i>
                         </div>
-                        <h4 class="fw-bold fs-5">1. Solicitud</h4>
-                        <p class="text-muted small">Inicia tu proceso con los formatos de solicitud y anteproyecto.</p>
-                        <a href="/solicitud.html" class="text-primary fw-bold text-decoration-none small mt-auto">
-                            Ver documentos →
-                        </a>
-                    </div>
+                        <h4 class="step-title">Solicitud</h4>
+                        <p class="step-desc">Descarga y completa los formatos de inicio. Incluye la solicitud oficial, autorización del proyecto y acuse de entrega.</p>
+                        <div class="step-link text-primary">
+                            Ver documentos <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </a>
                 </div>
                 <div class="col-md-4">
-                    <div class="card h-100 border-step-gray p-4 text-start card-custom shadow-sm">
-                        <div class="icon-box bg-gray-light mb-4">
-                            <i class="bi bi-check-circle text-muted fs-3"></i>
+                    <a href="/seguimiento.html" class="step-card">
+                        <div class="step-number">Etapa 02</div>
+                        <div class="step-icon" style="background:#f0fdf4;color:#059669;">
+                            <i class="bi bi-check-circle-fill"></i>
                         </div>
-                        <h4 class="fw-bold fs-5">2. Seguimiento</h4>
-                        <p class="text-muted small">Entrega tus reportes bimestrales y mantén tu expediente al día.</p>
-                        <a href="/seguimiento.html" class="text-primary fw-bold text-decoration-none small mt-auto">
-                            Ver documentos →
-                        </a>
-                    </div>
+                        <h4 class="step-title">Seguimiento</h4>
+                        <p class="step-desc">Entrega tus reportes bimestrales y mantén tu expediente actualizado durante el desarrollo del proyecto.</p>
+                        <div class="step-link" style="color:#059669;">
+                            Ver documentos <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </a>
                 </div>
                 <div class="col-md-4">
-                    <div class="card h-100 border-step-red p-4 text-start card-custom shadow-sm">
-                        <div class="icon-box bg-red-light mb-4">
-                            <i class="bi bi-mortarboard text-danger fs-3"></i>
+                    <a href="/liberacion.html" class="step-card">
+                        <div class="step-number">Etapa 03</div>
+                        <div class="step-icon" style="background:#fff1f2;color:#dc2626;">
+                            <i class="bi bi-mortarboard-fill"></i>
                         </div>
-                        <h4 class="fw-bold fs-5">3. Liberación</h4>
-                        <p class="text-muted small">Finaliza tu residencia con el informe final y obtén tu liberación.</p>
-                        <a href="/liberacion.html" class="text-danger fw-bold text-decoration-none small mt-auto">
-                            Ver documentos →
-                        </a>
-                    </div>
+                        <h4 class="step-title">Liberación</h4>
+                        <p class="step-desc">Finaliza tu residencia con el informe final y obtén tu carta de liberación para proceder con la titulación.</p>
+                        <div class="step-link text-danger">
+                            Ver documentos <i class="bi bi-arrow-right"></i>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="py-5 bg-light">
-        <div class="container py-5">
-            <div class="row align-items-center g-5 text-start">
-                <div class="col-lg-6">
-                    <h2 class="fw-bold mb-4">¿Por qué usar TECNM - RES?</h2>
-                    <p class="text-muted mb-5">El departamento de gestión tecnológica ha desarrollado esta
-                    plataforma para resolver los problemas comunes que enfrentan los residentes,
-                    garantizando transparencia y agilidad.</p>
-                    <div class="d-flex flex-column gap-4">
-                        <div class="d-flex gap-3">
-                            <div class="feat-icon bg-blue-light text-primary"><i class="bi bi-file-earmark-check"></i></div>
-                            <div>
-                                <h6 class="fw-bold mb-1">Documentación Oficial</h6>
-                                <p class="small text-muted mb-0">Formatos actualizados y validados por el departamento de gestión tecnológica.</p>
-                            </div>
-                        </div>
-                        <div class="d-flex gap-3">
-                            <div class="feat-icon bg-yellow-light text-warning"><i class="bi bi-lightbulb"></i></div>
-                            <div>
-                                <h6 class="fw-bold mb-1">Guías Explicativas</h6>
-                                <p class="small text-muted mb-0">Manuales paso a paso para el llenado correcto, evitando rechazos.</p>
-                            </div>
-                        </div>
-                        <div class="d-flex gap-3">
-                            <div class="feat-icon bg-green-light text-success"><i class="bi bi-clock-history"></i></div>
-                            <div>
-                                <h6 class="fw-bold mb-1">Optimización de Tiempo</h6>
-                                <p class="small text-muted mb-0">Reduce tiempos de espera al entregar documentación correcta desde el primer intento.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="p-4 bg-white rounded-4 shadow-sm border border-secondary border-opacity-25" style="max-width:400px;margin:0 auto;">
-                        <img src="/img/ImgenPrevisualizada.jpg" alt="Previsualización de formatos digitales"
-                             class="img-fluid rounded-3 shadow">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="cta-section text-white text-center py-5">
+    <!-- POR QUÉ RESIHUB -->
+    <section class="py-5" style="background:#f8fafc;">
         <div class="container py-4">
-            <h2 class="fw-bold mb-3">¿Listo para comenzar tu residencia?</h2>
-            <p class="text-white-50 mb-4">Accede directamente a los documentos de la primera etapa.</p>
-            <a href="/solicitud.html" class="btn btn-light btn-lg px-5 fw-bold rounded-pill text-red shadow">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span style="background:#eff6ff;color:#1d4ed8;border-radius:100px;padding:0.35rem 1rem;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">¿Por qué ResiHub?</span>
+                    <h2 class="fw-bold mt-3 mb-3" style="font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-0.02em;">
+                        Sin correos.<br>Sin versiones perdidas.<br>Sin retrasos.
+                    </h2>
+                    <p class="text-muted mb-4" style="line-height:1.8;">
+                        El departamento de gestión tecnológica desarrolló ResiHub para centralizar toda la documentación oficial en una plataforma institucional con backend funcional.
+                    </p>
+                    <div class="d-flex flex-column gap-3">
+                        <div class="d-flex gap-3 align-items-start">
+                            <div class="feature-icon" style="background:#eff6ff;color:#1d4ed8;"><i class="bi bi-file-earmark-check-fill"></i></div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Documentación oficial siempre vigente</h6>
+                                <p class="small text-muted mb-0">El administrador actualiza los formatos en tiempo real. Tú siempre descargas la versión más reciente.</p>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-3 align-items-start">
+                            <div class="feature-icon" style="background:#fffbeb;color:#d97706;"><i class="bi bi-lightbulb-fill"></i></div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Guías de llenado incluidas</h6>
+                                <p class="small text-muted mb-0">Cada formato tiene su guía explicativa para evitar errores de llenado y rechazos innecesarios.</p>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-3 align-items-start">
+                            <div class="feature-icon" style="background:#f0fdf4;color:#059669;"><i class="bi bi-graph-up-arrow"></i></div>
+                            <div>
+                                <h6 class="fw-bold mb-1">Estadísticas de uso en tiempo real</h6>
+                                <p class="small text-muted mb-0">El departamento puede ver qué documentos son más descargados para priorizar actualizaciones.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="p-4 rounded-4 shadow-sm" style="background:white;border:1px solid #e2e8f0;">
+                        <img src="/img/ImgenPrevisualizada.jpg" alt="Portal ResiHub" class="img-fluid rounded-3 shadow-sm">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section py-5">
+        <div class="container py-4 text-center" style="position:relative;z-index:1;">
+            <h2 class="fw-bold text-white mb-3" style="font-size:clamp(1.5rem,3vw,2rem);">¿Listo para comenzar tu residencia?</h2>
+            <p style="color:rgba(255,255,255,0.6);" class="mb-4">Accede a todos los formatos de la Etapa 1 y empieza tu trámite hoy.</p>
+            <a href="/solicitud.html" class="btn btn-light btn-lg px-5 fw-bold rounded-pill shadow" style="color:#991b1b;">
                 <i class="bi bi-arrow-right-circle me-2"></i>Ir a Solicitud
             </a>
         </div>
     </section>
 
+    <!-- FOOTER -->
     <footer class="footer-dark text-white pt-5 pb-3">
         <div class="container">
-            <div class="row g-4 border-bottom border-white-10 pb-4 mb-3 text-start">
+            <div class="row g-4 pb-4 mb-3" style="border-bottom:1px solid rgba(255,255,255,0.08);">
                 <div class="col-md-5">
-                    <h5 class="fw-bold mb-3 d-flex align-items-center">
-                        <i class="bi bi-mortarboard-fill me-2"></i>TECNM - RES
+                    <h5 class="fw-bold mb-2 d-flex align-items-center gap-2">
+                        <i class="bi bi-mortarboard-fill"></i>TECNM · RES
                     </h5>
-                    <p class="small text-secondary">Plataforma oficial del Instituto Tecnológico de Minatitlán.</p>
+                    <p class="small mb-0" style="color:#64748b;">Plataforma oficial del Instituto Tecnológico de Minatitlán.</p>
                 </div>
                 <div class="col-md-3">
-                    <h6 class="fw-bold mb-3">Enlaces Rápidos</h6>
-                    <ul class="list-unstyled small text-secondary">
-                        <li class="mb-2"><a href="/solicitud.html" class="text-secondary text-decoration-none">Solicitud de Residencia</a></li>
-                        <li class="mb-2"><a href="/seguimiento.html" class="text-secondary text-decoration-none">Formatos de Seguimiento</a></li>
-                        <li><a href="/liberacion.html" class="text-secondary text-decoration-none">Proceso de Liberación</a></li>
+                    <h6 class="fw-bold mb-3 small">Navegación</h6>
+                    <ul class="list-unstyled small mb-0" style="color:#64748b;">
+                        <li class="mb-2"><a href="/solicitud.html" class="text-decoration-none" style="color:#64748b;">Solicitud de Residencia</a></li>
+                        <li class="mb-2"><a href="/seguimiento.html" class="text-decoration-none" style="color:#64748b;">Formatos de Seguimiento</a></li>
+                        <li><a href="/liberacion.html" class="text-decoration-none" style="color:#64748b;">Proceso de Liberación</a></li>
                     </ul>
                 </div>
-                <div class="col-md-4 text-start">
-                    <h6 class="fw-bold mb-3">Contacto</h6>
-                    <p class="small text-secondary mb-1"><i class="bi bi-envelope me-2"></i>gestion.tecnologica@itmina.edu.mx</p>
-                    <p class="small text-secondary"><i class="bi bi-geo-alt me-2"></i>TecNM Campus Minatitlán</p>
+                <div class="col-md-4">
+                    <h6 class="fw-bold mb-3 small">Contacto</h6>
+                    <p class="small mb-2" style="color:#64748b;"><i class="bi bi-envelope me-2"></i>gestion.tecnologica@itmina.edu.mx</p>
+                    <p class="small mb-0" style="color:#64748b;"><i class="bi bi-geo-alt me-2"></i>TecNM Campus Minatitlán</p>
                 </div>
             </div>
-            <div class="text-center small text-secondary">© 2026 ResiHub - TecNM / ITMina</div>
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <p class="small mb-0" style="color:#475569;">© 2026 ResiHub · TecNM / ITMina</p>
+                <a href="/admin/" class="text-decoration-none" style="color:rgba(255,255,255,0.15);font-size:0.75rem;">
+                    <i class="bi bi-shield-lock"></i>
+                </a>
+            </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/api.js"></script>
     <script>
-        // Cargar estadísticas de la API
-        fetch('/api/admin/estadisticas', {
-            headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('rh_token') || '') }
-        })
-        .then(r => r.ok ? r.json() : null)
-        .then(json => {
-            if (json?.ok) {
-                document.getElementById('stat-docs').textContent       = json.data.totalDocs;
-                document.getElementById('stat-descargas').textContent  = json.data.totalDescargas;
+        // Stats dinámicas
+        fetch('/api/admin/estadisticas', { headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('rh_token')||'') } })
+            .then(r => r.ok ? r.json() : null)
+            .then(json => {
+                if (json?.ok) {
+                    animarNum(document.getElementById('stat-docs'),      json.data.totalDocs);
+                    animarNum(document.getElementById('stat-descargas'), json.data.totalDescargas);
+                }
+            }).catch(() => {});
+
+        function animarNum(el, n) {
+            if (!el) return;
+            let c = 0; const s = Math.ceil(n / 40);
+            const iv = setInterval(() => { c = Math.min(c + s, n); el.textContent = c; if (c >= n) clearInterval(iv); }, 25);
+        }
+
+        // Buscador global
+        let todosLosDocs = [];
+        fetch('/api/documentos').then(r => r.json()).then(json => {
+            if (json.ok) json.data.forEach(e => todosLosDocs.push(...e.documentos));
+        }).catch(() => {});
+
+        function buscarDocumento(q) {
+            const res = document.getElementById('resultados-busqueda');
+            if (!q.trim()) { res.innerHTML = ''; return; }
+            const filtrados = todosLosDocs.filter(d =>
+                d.titulo.toLowerCase().includes(q.toLowerCase()) ||
+                (d.descripcion||'').toLowerCase().includes(q.toLowerCase())
+            );
+            if (!filtrados.length) {
+                res.innerHTML = '<p class="text-muted small text-center py-2">Sin resultados para tu búsqueda.</p>';
+                return;
             }
-        })
-        .catch(() => {});
+            const etapas = { 1: { nombre: 'Solicitud', url: '/solicitud.html' }, 2: { nombre: 'Seguimiento', url: '/seguimiento.html' }, 3: { nombre: 'Liberación', url: '/liberacion.html' } };
+            res.innerHTML = `<div style="background:white;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;">
+                ${filtrados.map(d => `
+                <a href="${etapas[d.etapa_id]?.url || '#'}" class="d-flex align-items-center gap-3 p-3 text-decoration-none border-bottom" style="border-color:#f1f5f9!important;color:inherit;transition:background .15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
+                    <div style="width:36px;height:36px;background:#eff6ff;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#1d4ed8;flex-shrink:0;">
+                        <i class="bi bi-file-earmark-pdf-fill"></i>
+                    </div>
+                    <div style="overflow:hidden;flex:1;">
+                        <div class="fw-semibold small">${d.titulo}</div>
+                        <div class="text-muted" style="font-size:0.75rem;">Etapa ${d.etapa_id}: ${etapas[d.etapa_id]?.nombre}</div>
+                    </div>
+                    <i class="bi bi-arrow-right text-muted small"></i>
+                </a>`).join('')}
+            </div>`;
+        }
     </script>
 </body>
 </html>

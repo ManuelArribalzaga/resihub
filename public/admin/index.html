@@ -6,96 +6,358 @@
     <title>Panel Admin - ResiHub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
             --azul: #1d4ed8;
             --azul-dark: #1e3a8a;
             --guinda: #991b1b;
+            --sidebar-bg: #0f172a;
+            --sidebar-hover: rgba(255,255,255,0.07);
+            --surface: #ffffff;
+            --bg: #f1f5f9;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e2e8f0;
         }
-        body { font-family: 'Inter', sans-serif; background: #f1f5f9; }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; }
 
         /* ── LOGIN ── */
         #vista-login {
             min-height: 100vh;
-            background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1d4ed8 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        #vista-login::before {
+            content: '';
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(29,78,216,0.3) 0%, transparent 70%);
+            top: -200px; right: -200px;
+            border-radius: 50%;
+        }
+        #vista-login::after {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(153,27,27,0.2) 0%, transparent 70%);
+            bottom: -100px; left: -100px;
+            border-radius: 50%;
         }
         .login-card {
-            border-radius: 20px;
-            border: none;
-            box-shadow: 0 20px 60px rgba(0,0,0,.25);
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+            position: relative; z-index: 1;
         }
+        .login-input {
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.9rem;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .login-input:focus {
+            border-color: var(--azul);
+            box-shadow: 0 0 0 3px rgba(29,78,216,0.1);
+            outline: none;
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(29,78,216,0.4); }
+        .btn-login:active { transform: translateY(0); }
 
         /* ── SIDEBAR ── */
         #sidebar {
-            width: 250px; min-height: 100vh;
-            background: #1e293b;
-            transition: width .3s;
+            width: 260px;
+            min-height: 100vh;
+            background: var(--sidebar-bg);
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            transition: left .3s ease;
         }
-        #sidebar .nav-link { color: #94a3b8; border-radius: 10px; padding: .6rem 1rem; }
-        #sidebar .nav-link:hover,
-        #sidebar .nav-link.active { background: rgba(255,255,255,.08); color: #fff; }
-        #sidebar .nav-link i { width: 22px; }
+        .sidebar-logo {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .sidebar-logo span {
+            font-size: 1.1rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .sidebar-nav { padding: 1rem 0.75rem; flex: 1; }
+        .sidebar-section {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+            padding: 0.5rem 0.75rem 0.25rem;
+            margin-top: 0.5rem;
+        }
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.65rem 0.75rem;
+            border-radius: 10px;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all .2s;
+            margin-bottom: 2px;
+            cursor: pointer;
+        }
+        .nav-item-link:hover { background: var(--sidebar-hover); color: #fff; }
+        .nav-item-link.active { background: rgba(29,78,216,0.3); color: #60a5fa; font-weight: 600; }
+        .nav-item-link i { width: 18px; font-size: 1rem; }
+        .sidebar-footer { padding: 1rem 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); }
+        .sidebar-user-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 0.75rem;
+        }
 
-        /* ── CONTENIDO ── */
+        /* ── TOPBAR ── */
+        #topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0.875rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* ── CONTENT ── */
         #contenido-principal { flex: 1; overflow-x: hidden; }
-        .stat-card { border-radius: 16px; border: none; }
+        .content-area { padding: 1.5rem; }
         .seccion { display: none; }
         .seccion.activa { display: block; }
 
-        /* ── TABLAS ── */
-        .table-custom th { background: #f8fafc; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
-        .table-custom td { vertical-align: middle; font-size: .88rem; }
-        .badge-vigente { background: #dcfce7; color: #166534; }
-        .badge-inactivo { background: #fee2e2; color: #991b1b; }
+        /* ── STAT CARDS ── */
+        .stat-card {
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 1.25rem;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .stat-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1;
+            margin: 0.5rem 0 0.25rem;
+        }
+        .stat-label { font-size: 0.8rem; color: var(--muted); font-weight: 500; }
+        .stat-trend { font-size: 0.75rem; font-weight: 600; }
 
-        /* ── BOTÓN HAMBURGUESA ── */
+        /* ── CARDS ── */
+        .panel-card {
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .panel-card-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .panel-card-title { font-weight: 700; font-size: 0.9rem; }
+        .panel-card-body { padding: 1.25rem; }
+
+        /* ── TABLA ── */
+        .tabla-custom { font-size: 0.85rem; }
+        .tabla-custom thead th {
+            background: #f8fafc;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--muted);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .tabla-custom tbody td {
+            padding: 0.75rem 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .tabla-custom tbody tr:last-child td { border-bottom: none; }
+        .tabla-custom tbody tr:hover td { background: #f8fafc; }
+
+        /* ── BADGES ── */
+        .badge-vigente { background: #dcfce7; color: #166534; font-weight: 600; }
+        .badge-inactivo { background: #fee2e2; color: #991b1b; font-weight: 600; }
+        .badge-admin { background: #fef3c7; color: #92400e; }
+        .badge-gestor { background: #e0f2fe; color: #075985; }
+
+        /* ── ACTIVIDAD ── */
+        .actividad-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .actividad-item:last-child { border-bottom: none; }
+        .actividad-icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: #eff6ff;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--azul);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .actividad-texto { font-size: 0.82rem; font-weight: 600; line-height: 1.3; }
+        .actividad-tiempo { font-size: 0.75rem; color: var(--muted); }
+
+        /* ── TOASTS ── */
+        #toast-container {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .toast-custom {
+            background: var(--sidebar-bg);
+            color: white;
+            border-radius: 12px;
+            padding: 0.875rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 280px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            animation: slideInToast .3s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .toast-custom.success { border-left: 4px solid #22c55e; }
+        .toast-custom.error   { border-left: 4px solid #ef4444; }
+        .toast-custom.info    { border-left: 4px solid #60a5fa; }
+        @keyframes slideInToast {
+            from { transform: translateX(100px); opacity: 0; }
+            to   { transform: translateX(0);     opacity: 1; }
+        }
+
+        /* ── BTN HAMBURGUESA ── */
         #btn-menu { display: none; }
 
-        /* ── RESPONSIVE MÓVIL ── */
+        /* ── RESPONSIVE ── */
         @media (max-width: 768px) {
             #btn-menu { display: flex; }
-            #sidebar { position: fixed; top: 0; left: -260px; height: 100vh; width: 250px; z-index: 1050; transition: left .3s ease; overflow-y: auto; }
+            #sidebar {
+                position: fixed; top: 0; left: -280px;
+                height: 100vh; width: 260px;
+                z-index: 1050; overflow-y: auto;
+            }
             #sidebar.abierto { left: 0; }
             #overlay-sidebar { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1040; }
             #overlay-sidebar.visible { display: block; }
-            #contenido-principal { width: 100% !important; padding: 1rem !important; }
-            #topbar { position: sticky; top: 0; background: #fff; z-index: 100; padding: .75rem 1rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin: -1rem -1rem 1rem -1rem; }
+            #contenido-principal { width: 100%; }
+            .content-area { padding: 1rem; }
         }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: var(--muted);
+        }
+        .empty-state i { font-size: 2.5rem; opacity: 0.3; margin-bottom: 0.75rem; }
+
+        /* ── SEARCH BAR ── */
+        .search-input {
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.875rem;
+            background: #f8fafc;
+            transition: all .2s;
+            width: 240px;
+        }
+        .search-input:focus { border-color: var(--azul); background: white; outline: none; width: 280px; }
+        .search-wrapper { position: relative; }
+        .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 0.85rem; }
+
+        /* ── CHART CONTAINER ── */
+        .chart-container { position: relative; height: 200px; }
+
+        /* ── COUNTER ANIMATION ── */
+        @keyframes countUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .stat-value { animation: countUp .5s ease; }
     </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════
-     VISTA LOGIN
-════════════════════════════════════════════════ -->
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- OVERLAY -->
+<div id="overlay-sidebar" onclick="cerrarSidebar()"></div>
+
+<!-- ═══ LOGIN ═══════════════════════════════════════════════ -->
 <div id="vista-login" class="d-flex align-items-center justify-content-center p-4">
-    <div class="w-100" style="max-width:420px;">
+    <div style="max-width:420px; width:100%; position:relative; z-index:1;">
         <div class="text-center mb-4">
-            <img src="/img/ITMina.png" alt="ITMina" height="70" class="mb-3">
-            <h4 class="text-white fw-bold">Panel de Administración</h4>
-            <p class="text-white-50 small">ResiHub · TecNM Campus Minatitlán</p>
+            <img src="/img/ITMina.png" alt="ITMina" height="65" class="mb-3" style="filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3))">
+            <h4 class="text-white fw-bold mb-1">Panel de Administración</h4>
+            <p class="mb-0" style="color:rgba(255,255,255,0.5); font-size:0.875rem;">ResiHub · TecNM Campus Minatitlán</p>
         </div>
-        <div class="card login-card p-4">
-            <div id="login-error" class="alert alert-danger d-none small py-2" role="alert"></div>
+        <div class="login-card p-4">
+            <div id="login-error" class="alert alert-danger d-none py-2 rounded-3 small" role="alert"></div>
             <div class="mb-3">
-                <label class="form-label fw-bold small">Correo electrónico</label>
-                <input type="email" id="login-email" class="form-control rounded-3"
-                       placeholder="admin@itmina.edu.mx" value="admin@itmina.edu.mx">
+                <label class="form-label fw-semibold small mb-1">Correo electrónico</label>
+                <input type="email" id="login-email" class="form-control login-input" placeholder="correo@itmina.edu.mx">
             </div>
             <div class="mb-4">
-                <label class="form-label fw-bold small">Contraseña</label>
-                <input type="password" id="login-password" class="form-control rounded-3"
-                       placeholder="••••••••" value="Admin2026!">
+                <label class="form-label fw-semibold small mb-1">Contraseña</label>
+                <input type="password" id="login-password" class="form-control login-input" placeholder="••••••••">
             </div>
-            <button id="btn-login" class="btn btn-primary w-100 fw-bold rounded-3 py-2"
-                    style="background:var(--azul);border:none;">
+            <button id="btn-login" class="btn btn-primary btn-login w-100 text-white">
                 <span id="login-spinner" class="spinner-border spinner-border-sm me-2 d-none"></span>
                 Iniciar Sesión
             </button>
             <div class="text-center mt-3">
-                <a href="/" class="text-muted small text-decoration-none">
+                <a href="/" class="text-decoration-none" style="color:var(--muted); font-size:0.825rem;">
                     <i class="bi bi-arrow-left me-1"></i>Volver al portal
                 </a>
             </div>
@@ -103,221 +365,289 @@
     </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════
-     VISTA DASHBOARD (oculto hasta login)
-════════════════════════════════════════════════ -->
-<div id="overlay-sidebar" onclick="cerrarSidebar()"></div>
+<!-- ═══ DASHBOARD ════════════════════════════════════════════ -->
 <div id="vista-dashboard" class="d-none d-flex" style="min-height:100vh;">
 
     <!-- SIDEBAR -->
-    <nav id="sidebar" class="p-3">
-        <div class="d-flex align-items-center gap-2 mb-4 px-1">
-            <i class="bi bi-mortarboard-fill text-white fs-5"></i>
-            <span class="text-white fw-bold">ResiHub Admin</span>
+    <nav id="sidebar">
+        <div class="sidebar-logo d-flex align-items-center gap-2">
+            <div style="width:32px;height:32px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);border-radius:8px;display:flex;align-items:center;justify-content:center;">
+                <i class="bi bi-mortarboard-fill text-white" style="font-size:0.9rem;"></i>
+            </div>
+            <span>ResiHub Admin</span>
         </div>
-        <ul class="nav flex-column gap-1">
-            <li><a href="#" class="nav-link active" data-seccion="dashboard">
-                <i class="bi bi-grid-1x2"></i> Dashboard
-            </a></li>
-            <li><a href="#" class="nav-link" data-seccion="documentos">
-                <i class="bi bi-file-earmark-text"></i> Documentos
-            </a></li>
-            <li><a href="#" class="nav-link" data-seccion="usuarios">
-                <i class="bi bi-people"></i> Usuarios
-            </a></li>
-            <li class="mt-4 border-top border-white border-opacity-10 pt-3">
-                <a href="/" class="nav-link">
-                    <i class="bi bi-box-arrow-left"></i> Ver Portal
+
+        <div class="sidebar-nav">
+            <div class="sidebar-section">Principal</div>
+            <a class="nav-item-link active" data-seccion="dashboard">
+                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+            </a>
+            <a class="nav-item-link" data-seccion="documentos">
+                <i class="bi bi-file-earmark-text-fill"></i> Documentos
+            </a>
+            <div id="link-usuarios-wrapper">
+                <a class="nav-item-link" data-seccion="usuarios">
+                    <i class="bi bi-people-fill"></i> Usuarios
                 </a>
-                <a href="#" id="btn-logout" class="nav-link text-danger">
-                    <i class="bi bi-power"></i> Cerrar Sesión
-                </a>
-            </li>
-        </ul>
-        <div class="mt-auto px-1 pt-4">
-            <p class="text-secondary small mb-0" id="sidebar-user"></p>
-            <span id="sidebar-rol" class="badge rounded-pill mt-1 small"></span>
+            </div>
+
+            <div class="sidebar-section mt-3">Sistema</div>
+            <a class="nav-item-link" href="/" target="_blank">
+                <i class="bi bi-box-arrow-up-right"></i> Ver Portal
+            </a>
+            <a class="nav-item-link" id="btn-logout" style="color:rgba(239,68,68,0.7);">
+                <i class="bi bi-power"></i> Cerrar Sesión
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user-card">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1d4ed8,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:0.8rem;color:white;font-weight:700;" id="avatar-iniciales">A</div>
+                    <div style="overflow:hidden;">
+                        <div class="text-white fw-semibold" style="font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" id="sidebar-user">Usuario</div>
+                        <span id="sidebar-rol" class="badge rounded-pill" style="font-size:0.65rem;"></span>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 
     <!-- CONTENIDO -->
-    <main id="contenido-principal" class="p-4">
+    <main id="contenido-principal" style="flex:1;overflow-x:hidden;">
 
-        <!-- ── TOPBAR ── -->
-        <div id="topbar" class="d-flex justify-content-between align-items-center mb-4">
-            <button id="btn-menu" class="btn btn-sm btn-outline-secondary rounded-3 me-2" onclick="toggleSidebar()">
-                <i class="bi bi-list fs-5"></i>
-            </button>
-            <h5 class="fw-bold mb-0" id="titulo-seccion">Dashboard</h5>
-            <span class="badge bg-primary rounded-pill px-3 py-2 small" id="topbar-user"></span>
+        <!-- TOPBAR -->
+        <div id="topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button id="btn-menu" class="btn btn-sm btn-outline-secondary rounded-3" onclick="toggleSidebar()">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div>
+                    <h6 class="fw-bold mb-0" id="titulo-seccion">Dashboard</h6>
+                    <p class="mb-0 text-muted" style="font-size:0.75rem;" id="subtitulo-seccion">Vista general del sistema</p>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge rounded-pill px-3 py-2" style="background:#f1f5f9;color:var(--text);font-size:0.75rem;" id="topbar-user"></span>
+            </div>
         </div>
 
-        <!-- ══ SECCIÓN DASHBOARD ══ -->
+        <div class="content-area">
+
+        <!-- ══ DASHBOARD ══════════════════════════════════════ -->
         <section id="sec-dashboard" class="seccion activa">
+
+            <!-- Stat Cards -->
             <div class="row g-3 mb-4">
-                <div class="col-sm-6 col-xl-3">
-                    <div class="card stat-card p-4 shadow-sm">
-                        <div class="d-flex justify-content-between align-items-center">
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <p class="text-muted small mb-1">Documentos activos</p>
-                                <h3 class="fw-bold mb-0" id="st-docs">—</h3>
+                                <div class="stat-label">Documentos activos</div>
+                                <div class="stat-value text-primary" id="st-docs">—</div>
                             </div>
-                            <div class="bg-blue-light rounded-3 p-3">
-                                <i class="bi bi-file-earmark-text text-primary fs-4"></i>
+                            <div class="stat-icon" style="background:#eff6ff;color:#1d4ed8;">
+                                <i class="bi bi-file-earmark-text-fill"></i>
+                            </div>
+                        </div>
+                        <div class="stat-trend text-success mt-2"><i class="bi bi-arrow-up-short"></i> En 3 etapas</div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="stat-label">Descargas totales</div>
+                                <div class="stat-value" style="color:#059669;" id="st-descargas">—</div>
+                            </div>
+                            <div class="stat-icon" style="background:#f0fdf4;color:#059669;">
+                                <i class="bi bi-download"></i>
+                            </div>
+                        </div>
+                        <div class="stat-trend text-muted mt-2"><i class="bi bi-calendar3"></i> Histórico</div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="stat-label">Descargas hoy</div>
+                                <div class="stat-value" style="color:#d97706;" id="st-hoy">—</div>
+                            </div>
+                            <div class="stat-icon" style="background:#fffbeb;color:#d97706;">
+                                <i class="bi bi-calendar-check-fill"></i>
+                            </div>
+                        </div>
+                        <div class="stat-trend text-muted mt-2"><i class="bi bi-clock"></i> Últimas 24h</div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="stat-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="stat-label">Usuarios admin</div>
+                                <div class="stat-value" style="color:#7c3aed;" id="st-usuarios">—</div>
+                            </div>
+                            <div class="stat-icon" style="background:#f5f3ff;color:#7c3aed;">
+                                <i class="bi bi-person-badge-fill"></i>
+                            </div>
+                        </div>
+                        <div class="stat-trend text-muted mt-2"><i class="bi bi-shield-check"></i> Con acceso</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficas + Actividad -->
+            <div class="row g-3 mb-4">
+
+                <!-- Gráfica descargas 7 días -->
+                <div class="col-lg-8">
+                    <div class="panel-card h-100">
+                        <div class="panel-card-header">
+                            <span class="panel-card-title"><i class="bi bi-bar-chart-fill me-2 text-primary"></i>Descargas últimos 7 días</span>
+                        </div>
+                        <div class="panel-card-body">
+                            <div class="chart-container">
+                                <canvas id="chart-descargas"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="card stat-card p-4 shadow-sm">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <p class="text-muted small mb-1">Descargas totales</p>
-                                <h3 class="fw-bold mb-0" id="st-descargas">—</h3>
-                            </div>
-                            <div class="bg-green-light rounded-3 p-3" style="background:#dcfce7;">
-                                <i class="bi bi-download text-success fs-4"></i>
-                            </div>
+
+                <!-- Gráfica por etapa -->
+                <div class="col-lg-4">
+                    <div class="panel-card h-100">
+                        <div class="panel-card-header">
+                            <span class="panel-card-title"><i class="bi bi-pie-chart-fill me-2 text-primary"></i>Por etapa</span>
                         </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="card stat-card p-4 shadow-sm">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <p class="text-muted small mb-1">Descargas hoy</p>
-                                <h3 class="fw-bold mb-0" id="st-hoy">—</h3>
-                            </div>
-                            <div class="rounded-3 p-3" style="background:#fef9c3;">
-                                <i class="bi bi-calendar-check text-warning fs-4"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="card stat-card p-4 shadow-sm">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <p class="text-muted small mb-1">Usuarios</p>
-                                <h3 class="fw-bold mb-0" id="st-usuarios">—</h3>
-                            </div>
-                            <div class="rounded-3 p-3" style="background:#fce7f3;">
-                                <i class="bi bi-people text-pink fs-4" style="color:#db2777;"></i>
+                        <div class="panel-card-body">
+                            <div class="chart-container">
+                                <canvas id="chart-etapas"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Top documentos -->
-            <div class="card shadow-sm rounded-4 p-4">
-                <h6 class="fw-bold mb-3">Top documentos más descargados</h6>
-                <div id="tabla-top-docs">
-                    <div class="text-center py-3 text-muted small">Cargando...</div>
+            <!-- Top docs + Actividad reciente -->
+            <div class="row g-3">
+                <div class="col-lg-6">
+                    <div class="panel-card">
+                        <div class="panel-card-header">
+                            <span class="panel-card-title"><i class="bi bi-trophy-fill me-2" style="color:#d97706;"></i>Top documentos</span>
+                        </div>
+                        <div class="panel-card-body p-0">
+                            <div id="tabla-top-docs" class="px-3 py-2"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="panel-card">
+                        <div class="panel-card-header">
+                            <span class="panel-card-title"><i class="bi bi-activity me-2 text-primary"></i>Actividad reciente</span>
+                        </div>
+                        <div class="panel-card-body p-0">
+                            <div id="lista-actividad" class="px-3 py-2"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </section>
 
-        <!-- ══ SECCIÓN DOCUMENTOS ══ -->
+        <!-- ══ DOCUMENTOS ══════════════════════════════════════ -->
         <section id="sec-documentos" class="seccion">
-            <!-- Botón nuevo -->
-            <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-primary rounded-3 fw-bold btn-sm px-4"
-                        style="background:var(--azul);border:none;"
-                        onclick="abrirModalNuevoDoc()">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div class="search-wrapper">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" class="search-input" id="buscar-docs" placeholder="Buscar documento..." oninput="filtrarDocumentos(this.value)">
+                </div>
+                <button class="btn btn-primary rounded-3 fw-bold btn-sm px-4" style="background:var(--azul);border:none;" onclick="abrirModalNuevoDoc()">
                     <i class="bi bi-plus-lg me-2"></i>Nuevo Documento
                 </button>
             </div>
-
-            <div class="card shadow-sm rounded-4">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-custom table-hover mb-0" id="tabla-documentos">
-                            <thead>
-                                <tr>
-                                    <th class="ps-4 py-3">Título</th>
-                                    <th>Etapa</th>
-                                    <th>Archivo</th>
-                                    <th>Estado</th>
-                                    <th class="pe-4">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="body-documentos">
-                                <tr><td colspan="5" class="text-center py-4 text-muted small">Cargando...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="panel-card">
+                <div class="table-responsive">
+                    <table class="table tabla-custom mb-0" id="tabla-documentos">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Documento</th>
+                                <th>Etapa</th>
+                                <th>Archivo</th>
+                                <th>Estado</th>
+                                <th class="pe-4">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="body-documentos">
+                            <tr><td colspan="5" class="text-center py-5 text-muted small">Cargando...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
 
-        <!-- ══ SECCIÓN USUARIOS ══ -->
+        <!-- ══ USUARIOS ══════════════════════════════════════ -->
         <section id="sec-usuarios" class="seccion">
             <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-primary rounded-3 fw-bold btn-sm px-4"
-                        style="background:var(--azul);border:none;"
-                        onclick="abrirModalNuevoUsuario()">
+                <button class="btn btn-primary rounded-3 fw-bold btn-sm px-4" style="background:var(--azul);border:none;" onclick="abrirModalNuevoUsuario()">
                     <i class="bi bi-person-plus me-2"></i>Nuevo Usuario
                 </button>
             </div>
-            <div class="card shadow-sm rounded-4">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-custom table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th class="ps-4 py-3">Nombre</th>
-                                    <th>Email</th>
-                                    <th>Rol</th>
-                                    <th>Estado</th>
-                                    <th class="pe-4">Registrado</th>
-                                </tr>
-                            </thead>
-                            <tbody id="body-usuarios">
-                                <tr><td colspan="5" class="text-center py-4 text-muted small">Cargando...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="panel-card">
+                <div class="table-responsive">
+                    <table class="table tabla-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Nombre</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th class="pe-4">Registrado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="body-usuarios">
+                            <tr><td colspan="6" class="text-center py-5 text-muted small">Cargando...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
 
+        </div><!-- content-area -->
     </main>
 </div>
 
-<!-- ═══════════════════════════════════════════════
-     MODAL: NUEVO / EDITAR DOCUMENTO
-════════════════════════════════════════════════ -->
+<!-- ═══ MODAL DOCUMENTO ═══════════════════════════════════════ -->
 <div class="modal fade" id="modalDocumento" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
             <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title fw-bold" id="modal-doc-titulo">Nuevo Documento</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body pt-2" id="modal-doc-error-wrap">
-                <div id="modal-doc-error" class="alert alert-danger d-none small py-2"></div>
+            <div class="modal-body pt-2">
+                <div id="modal-doc-error" class="alert alert-danger d-none small py-2 rounded-3"></div>
                 <div class="row g-3">
                     <input type="hidden" id="doc-id">
                     <div class="col-md-8">
-                        <label class="form-label fw-bold small">Título <span class="text-danger">*</span></label>
-                        <input type="text" id="doc-titulo" class="form-control rounded-3" placeholder="Ej: Solicitud de Residencia">
+                        <label class="form-label fw-semibold small">Título <span class="text-danger">*</span></label>
+                        <input type="text" id="doc-titulo" class="form-control rounded-3">
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold small">Etapa <span class="text-danger">*</span></label>
+                        <label class="form-label fw-semibold small">Etapa <span class="text-danger">*</span></label>
                         <select id="doc-etapa" class="form-select rounded-3">
-                            <option value="1">1 - Solicitud</option>
-                            <option value="2">2 - Seguimiento</option>
-                            <option value="3">3 - Liberación</option>
+                            <option value="1">1 — Solicitud</option>
+                            <option value="2">2 — Seguimiento</option>
+                            <option value="3">3 — Liberación</option>
                         </select>
                     </div>
                     <div class="col-12">
-                        <label class="form-label fw-bold small">Descripción</label>
-                        <textarea id="doc-descripcion" class="form-control rounded-3" rows="2"
-                                  placeholder="Describe brevemente para qué sirve este documento..."></textarea>
+                        <label class="form-label fw-semibold small">Descripción</label>
+                        <textarea id="doc-descripcion" class="form-control rounded-3" rows="2"></textarea>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold small">Tipo</label>
+                        <label class="form-label fw-semibold small">Tipo</label>
                         <select id="doc-tipo" class="form-select rounded-3">
                             <option value="formato">Formato</option>
                             <option value="guia">Guía</option>
@@ -326,37 +656,30 @@
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold small">Orden</label>
+                        <label class="form-label fw-semibold small">Orden</label>
                         <input type="number" id="doc-orden" class="form-control rounded-3" value="1" min="1" max="20">
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label fw-bold small">Estado</label>
+                        <label class="form-label fw-semibold small">Estado</label>
                         <select id="doc-vigente" class="form-select rounded-3">
                             <option value="true">Vigente</option>
                             <option value="false">Inactivo</option>
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold small">Archivo principal (PDF/DOCX)</label>
-                        <input type="file" id="doc-archivo" class="form-control rounded-3"
-                               accept=".pdf,.docx,.doc,.xlsx">
+                        <label class="form-label fw-semibold small">Archivo principal (PDF/DOCX)</label>
+                        <input type="file" id="doc-archivo" class="form-control rounded-3" accept=".pdf,.docx,.doc,.xlsx">
                         <p class="text-muted small mt-1 mb-0">Máx. 10 MB</p>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold small">Archivo de Guía (opcional)</label>
-                        <input type="file" id="doc-guia-archivo" class="form-control rounded-3"
-                               accept=".pdf,.docx,.doc">
-                        <p class="text-muted small mt-1 mb-0">Guía de llenado</p>
+                        <label class="form-label fw-semibold small">Guía de llenado (opcional)</label>
+                        <input type="file" id="doc-guia-archivo" class="form-control rounded-3" accept=".pdf,.docx,.doc">
                     </div>
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-outline-secondary rounded-3 btn-sm px-4"
-                        data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" id="btn-guardar-doc"
-                        class="btn btn-primary rounded-3 fw-bold btn-sm px-4"
-                        style="background:var(--azul);border:none;"
-                        onclick="guardarDocumento()">
+                <button class="btn btn-outline-secondary rounded-3 btn-sm px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button id="btn-guardar-doc" class="btn btn-primary rounded-3 fw-bold btn-sm px-4" style="background:var(--azul);border:none;" onclick="guardarDocumento()">
                     <span id="spinner-doc" class="spinner-border spinner-border-sm me-2 d-none"></span>
                     Guardar
                 </button>
@@ -365,45 +688,40 @@
     </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════
-     MODAL: NUEVO USUARIO
-════════════════════════════════════════════════ -->
+<!-- ═══ MODAL USUARIO ═════════════════════════════════════════ -->
 <div class="modal fade" id="modalUsuario" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
             <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">Nuevo Administrador</h5>
+                <h5 class="modal-title fw-bold">Nuevo Usuario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body pt-2">
-                <div id="modal-usr-error" class="alert alert-danger d-none small py-2"></div>
+                <div id="modal-usr-error" class="alert alert-danger d-none small py-2 rounded-3"></div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold small">Nombre completo</label>
+                    <label class="form-label fw-semibold small">Nombre completo</label>
                     <input type="text" id="usr-nombre" class="form-control rounded-3">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold small">Email</label>
+                    <label class="form-label fw-semibold small">Email institucional</label>
                     <input type="email" id="usr-email" class="form-control rounded-3">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold small">Contraseña (mín. 8 caracteres)</label>
+                    <label class="form-label fw-semibold small">Contraseña (mín. 8 caracteres)</label>
                     <input type="password" id="usr-password" class="form-control rounded-3">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold small">Rol</label>
+                    <label class="form-label fw-semibold small">Rol</label>
                     <select id="usr-rol" class="form-select rounded-3">
-                        <option value="gestor">📋 Gestor — puede subir y editar documentos</option>
+                        <option value="gestor">📋 Gestor — sube y edita documentos</option>
                         <option value="admin">👑 Administrador — acceso total</option>
                     </select>
                     <p class="text-muted small mt-1 mb-0">El gestor no puede eliminar documentos ni gestionar usuarios.</p>
                 </div>
             </div>
             <div class="modal-footer border-0 pt-0">
-                <button class="btn btn-outline-secondary rounded-3 btn-sm px-4"
-                        data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-primary rounded-3 fw-bold btn-sm px-4"
-                        style="background:var(--azul);border:none;"
-                        onclick="guardarUsuario()">Crear Admin</button>
+                <button class="btn btn-outline-secondary rounded-3 btn-sm px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-primary rounded-3 fw-bold btn-sm px-4" style="background:var(--azul);border:none;" onclick="guardarUsuario()">Crear Usuario</button>
             </div>
         </div>
     </div>
@@ -411,261 +729,329 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// ─────────────────────────────────────────────
-//  ESTADO GLOBAL
-// ─────────────────────────────────────────────
+// ─── ESTADO ──────────────────────────────────────────────────
 const API = '/api';
 let token = localStorage.getItem('rh_token') || '';
+let _rolActual = null;
+let _docsData  = [];
+let chartDescargas = null;
+let chartEtapas    = null;
 
-// ─────────────────────────────────────────────
-//  INIT
-// ─────────────────────────────────────────────
+// ─── INIT ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     if (token) verificarToken();
-    // LOGIN: Enter key
-    document.getElementById('login-password').addEventListener('keydown', e => {
-        if (e.key === 'Enter') hacerLogin();
-    });
+    document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') hacerLogin(); });
     document.getElementById('btn-login').addEventListener('click', hacerLogin);
     document.getElementById('btn-logout').addEventListener('click', cerrarSesion);
-
-    // SIDEBAR NAV
     document.querySelectorAll('[data-seccion]').forEach(link => {
-        link.addEventListener('click', e => {
-            e.preventDefault();
-            mostrarSeccion(link.dataset.seccion); cerrarSidebar();
-        });
+        link.addEventListener('click', e => { e.preventDefault(); mostrarSeccion(link.dataset.seccion); cerrarSidebar(); });
     });
 });
 
-// ─────────────────────────────────────────────
-//  AUTH
-// ─────────────────────────────────────────────
+// ─── TOAST ───────────────────────────────────────────────────
+function toast(msg, tipo = 'success') {
+    const icons = { success: 'check-circle-fill', error: 'x-circle-fill', info: 'info-circle-fill' };
+    const t = document.createElement('div');
+    t.className = `toast-custom ${tipo}`;
+    t.innerHTML = `<i class="bi bi-${icons[tipo]}"></i> ${msg}`;
+    document.getElementById('toast-container').appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(100px)'; t.style.transition = '.3s'; setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+// ─── AUTH ────────────────────────────────────────────────────
 async function hacerLogin() {
     const email    = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     const errEl    = document.getElementById('login-error');
     const spinner  = document.getElementById('login-spinner');
-
     errEl.classList.add('d-none');
     spinner.classList.remove('d-none');
     document.getElementById('btn-login').disabled = true;
-
     try {
-        const res  = await fetch(`${API}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
+        const res  = await fetch(`${API}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
         const json = await res.json();
-
-        if (!json.ok) {
-            errEl.textContent = json.mensaje;
-            errEl.classList.remove('d-none');
-        } else {
-            token = json.token;
-            localStorage.setItem('rh_token', token);
-            mostrarDashboard(json.usuario);
-        }
-    } catch {
-        errEl.textContent = 'Error de conexión con el servidor.';
-        errEl.classList.remove('d-none');
-    } finally {
-        spinner.classList.add('d-none');
-        document.getElementById('btn-login').disabled = false;
-    }
+        if (!json.ok) { errEl.textContent = json.mensaje; errEl.classList.remove('d-none'); }
+        else { token = json.token; localStorage.setItem('rh_token', token); mostrarDashboard(json.usuario); }
+    } catch { errEl.textContent = 'Error de conexión.'; errEl.classList.remove('d-none'); }
+    finally { spinner.classList.add('d-none'); document.getElementById('btn-login').disabled = false; }
 }
 
 async function verificarToken() {
     try {
-        const res  = await fetch(`${API}/auth/me`, { headers: authHeaders() });
+        const res = await fetch(`${API}/auth/me`, { headers: authH() });
         const json = await res.json();
-        if (json.ok) mostrarDashboard(json.usuario);
-        else cerrarSesion();
+        if (json.ok) mostrarDashboard(json.usuario); else cerrarSesion();
     } catch { cerrarSesion(); }
 }
 
 function cerrarSesion() {
     localStorage.removeItem('rh_token');
-    token = '';
-    window._rolActual = null;
-
-    // Resetear UI al estado inicial
+    token = ''; _rolActual = null;
     document.getElementById('vista-login').classList.remove('d-none');
     document.getElementById('vista-dashboard').classList.add('d-none');
-
-    // Resetear badge de rol
-    const rolBadge = document.getElementById('sidebar-rol');
-    if (rolBadge) { rolBadge.textContent = ''; rolBadge.className = ''; }
-
-    // Volver a mostrar el link de Usuarios (por si era gestor)
-    const linkUsuarios = document.querySelector('[data-seccion="usuarios"]');
-    if (linkUsuarios) linkUsuarios.parentElement.style.display = '';
-
-    // Resetear textos
     document.getElementById('sidebar-user').textContent = '';
     document.getElementById('topbar-user').textContent  = '';
-
-    // Volver siempre al Dashboard al hacer logout
+    document.getElementById('sidebar-rol').textContent  = '';
+    document.getElementById('sidebar-rol').className    = 'badge rounded-pill';
+    document.getElementById('avatar-iniciales').textContent = 'A';
+    const wrapper = document.getElementById('link-usuarios-wrapper');
+    if (wrapper) wrapper.style.display = '';
     mostrarSeccion('dashboard');
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-password').value = '';
 }
 
 function mostrarDashboard(usuario) {
+    _rolActual = usuario.rol;
     document.getElementById('vista-login').classList.add('d-none');
     document.getElementById('vista-dashboard').classList.remove('d-none');
-    document.getElementById('sidebar-user').textContent = usuario.nombre;
-    document.getElementById('topbar-user').textContent  = usuario.email + ' · ' + (usuario.rol === 'admin' ? '👑 Admin' : '📋 Gestor');
+    document.getElementById('sidebar-user').textContent     = usuario.nombre;
+    document.getElementById('avatar-iniciales').textContent = usuario.nombre.charAt(0).toUpperCase();
+    document.getElementById('topbar-user').textContent      = usuario.rol === 'admin' ? '👑 Admin' : '📋 Gestor';
 
-    // Mostrar badge de rol en sidebar
     const rolBadge = document.getElementById('sidebar-rol');
     if (usuario.rol === 'admin') {
-        rolBadge.textContent = '👑 Administrador';
-        rolBadge.className = 'badge rounded-pill mt-1 small bg-warning text-dark';
+        rolBadge.textContent = '👑 Admin';
+        rolBadge.className   = 'badge rounded-pill';
+        rolBadge.style.background = '#fef3c7'; rolBadge.style.color = '#92400e';
     } else {
         rolBadge.textContent = '📋 Gestor';
-        rolBadge.className = 'badge rounded-pill mt-1 small bg-info text-dark';
+        rolBadge.className   = 'badge rounded-pill';
+        rolBadge.style.background = '#e0f2fe'; rolBadge.style.color = '#075985';
+        const wrapper = document.getElementById('link-usuarios-wrapper');
+        if (wrapper) wrapper.style.display = 'none';
     }
-
-    // Ocultar sección Usuarios si es gestor
-    const linkUsuarios = document.querySelector('[data-seccion="usuarios"]');
-    const secUsuarios  = document.getElementById('sec-usuarios');
-    if (usuario.rol !== 'admin') {
-        if (linkUsuarios) linkUsuarios.parentElement.style.display = 'none';
-    }
-
-    // Ocultar botón Eliminar en documentos si es gestor
-    window._rolActual = usuario.rol;
-
     cargarEstadisticas();
+    cargarGraficas();
+    cargarActividad();
     cargarTablaDocumentos();
 }
 
-// ─────────────────────────────────────────────
-//  HELPERS
-// ─────────────────────────────────────────────
-function authHeaders() {
-    return { 'Authorization': `Bearer ${token}` };
-}
-function authHeadersJson() {
-    return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
-}
+// ─── HELPERS ─────────────────────────────────────────────────
+const authH     = () => ({ 'Authorization': `Bearer ${token}` });
+const authHJson = () => ({ 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' });
+
 function mostrarSeccion(id) {
     document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
     document.querySelectorAll('[data-seccion]').forEach(l => l.classList.remove('active'));
-    document.getElementById(`sec-${id}`).classList.add('activa');
-    document.querySelector(`[data-seccion="${id}"]`).classList.add('active');
-    document.getElementById('titulo-seccion').textContent =
-        id.charAt(0).toUpperCase() + id.slice(1);
+    document.getElementById(`sec-${id}`)?.classList.add('activa');
+    document.querySelector(`[data-seccion="${id}"]`)?.classList.add('active');
+    const titulos = { dashboard: ['Dashboard', 'Vista general del sistema'], documentos: ['Documentos', 'Gestión de formatos y guías'], usuarios: ['Usuarios', 'Administración de accesos'] };
+    document.getElementById('titulo-seccion').textContent    = titulos[id]?.[0] || id;
+    document.getElementById('subtitulo-seccion').textContent = titulos[id]?.[1] || '';
     if (id === 'documentos') cargarTablaDocumentos();
     if (id === 'usuarios')   cargarTablaUsuarios();
 }
 
-// ─────────────────────────────────────────────
-//  ESTADÍSTICAS
-// ─────────────────────────────────────────────
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function tiempoRelativo(fechaStr) {
+    const diff = Date.now() - new Date(fechaStr);
+    const m = Math.floor(diff / 60000);
+    if (m < 1)  return 'hace un momento';
+    if (m < 60) return `hace ${m} min`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `hace ${h}h`;
+    return `hace ${Math.floor(h/24)} días`;
+}
+
+function animarContador(el, valor) {
+    const n = parseInt(valor) || 0;
+    let current = 0;
+    const step = Math.ceil(n / 30);
+    const interval = setInterval(() => {
+        current = Math.min(current + step, n);
+        el.textContent = current;
+        if (current >= n) clearInterval(interval);
+    }, 30);
+}
+
+// ─── ESTADÍSTICAS ─────────────────────────────────────────────
 async function cargarEstadisticas() {
     try {
-        const res  = await fetch(`${API}/admin/estadisticas`, { headers: authHeaders() });
+        const res  = await fetch(`${API}/admin/estadisticas`, { headers: authH() });
         const json = await res.json();
         if (!json.ok) return;
         const d = json.data;
-        document.getElementById('st-docs').textContent      = d.totalDocs;
-        document.getElementById('st-descargas').textContent = d.totalDescargas;
-        document.getElementById('st-hoy').textContent       = d.descargasHoy;
-        document.getElementById('st-usuarios').textContent  = d.totalUsuarios;
+        animarContador(document.getElementById('st-docs'),      d.totalDocs);
+        animarContador(document.getElementById('st-descargas'), d.totalDescargas);
+        animarContador(document.getElementById('st-hoy'),       d.descargasHoy);
+        animarContador(document.getElementById('st-usuarios'),  d.totalUsuarios);
 
-        // Top docs table
-        const tbody = document.getElementById('tabla-top-docs');
-        if (!d.topDocs.length) {
-            tbody.innerHTML = '<p class="text-muted small">Sin descargas registradas aún.</p>';
+        const topEl = document.getElementById('tabla-top-docs');
+        if (!d.topDocs?.length) {
+            topEl.innerHTML = '<div class="empty-state"><i class="bi bi-download"></i><p class="small">Sin descargas aún</p></div>';
             return;
         }
-        tbody.innerHTML = `
-          <table class="table table-sm mb-0">
-            <thead><tr>
-              <th class="text-muted small fw-bold" style="font-size:.75rem;">DOCUMENTO</th>
-              <th class="text-muted small fw-bold text-end" style="font-size:.75rem;">DESCARGAS</th>
-            </tr></thead>
-            <tbody>
-              ${d.topDocs.map(r => `
-                <tr>
-                  <td class="small">${escHtml(r.titulo)}</td>
-                  <td class="text-end"><span class="badge bg-primary rounded-pill">${r.descargas}</span></td>
-                </tr>`).join('')}
-            </tbody>
-          </table>`;
-    } catch(err) { console.error(err); }
+        const max = Math.max(...d.topDocs.map(r => parseInt(r.descargas)));
+        topEl.innerHTML = d.topDocs.map(r => {
+            const pct = max > 0 ? (parseInt(r.descargas) / max * 100) : 0;
+            return `<div class="py-2 border-bottom" style="border-color:#f1f5f9!important;">
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="small fw-semibold" style="max-width:75%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(r.titulo)}</span>
+                    <span class="badge rounded-pill bg-primary">${r.descargas}</span>
+                </div>
+                <div style="height:4px;background:#f1f5f9;border-radius:4px;">
+                    <div style="height:4px;background:linear-gradient(90deg,#1d4ed8,#7c3aed);border-radius:4px;width:${pct}%;transition:width .8s ease;"></div>
+                </div>
+            </div>`;
+        }).join('');
+    } catch(e) { console.error(e); }
 }
 
-// ─────────────────────────────────────────────
-//  TABLA DOCUMENTOS
-// ─────────────────────────────────────────────
-async function cargarTablaDocumentos() {
-    const tbody = document.getElementById('body-documentos');
-    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted small">Cargando...</td></tr>';
+// ─── GRÁFICAS ─────────────────────────────────────────────────
+async function cargarGraficas() {
     try {
-        const res  = await fetch(`${API}/admin/documentos`, { headers: authHeaders() });
+        const [r1, r2] = await Promise.all([
+            fetch(`${API}/admin/descargas-por-dia`, { headers: authH() }).then(r => r.json()),
+            fetch(`${API}/admin/estadisticas`,       { headers: authH() }).then(r => r.json())
+        ]);
+
+        // Gráfica de barras - últimos 7 días
+        if (r1.ok) {
+            const labels = r1.data.map(d => new Date(d.dia).toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric' }));
+            const datos  = r1.data.map(d => parseInt(d.total));
+            const ctx1   = document.getElementById('chart-descargas').getContext('2d');
+            if (chartDescargas) chartDescargas.destroy();
+            chartDescargas = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Descargas',
+                        data: datos,
+                        backgroundColor: 'rgba(29,78,216,0.15)',
+                        borderColor: '#1d4ed8',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0, font: { family: 'Plus Jakarta Sans', size: 11 } }, grid: { color: '#f1f5f9' } },
+                        x: { ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Gráfica de dona - por etapa
+        if (r2.ok && r2.data.porEtapa) {
+            const etapas = r2.data.porEtapa;
+            const ctx2   = document.getElementById('chart-etapas').getContext('2d');
+            if (chartEtapas) chartEtapas.destroy();
+            chartEtapas = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels:   etapas.map(e => e.nombre),
+                    datasets: [{ data: etapas.map(e => parseInt(e.descargas)), backgroundColor: ['#1d4ed8','#059669','#dc2626'], borderWidth: 0, hoverOffset: 8 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: 'Plus Jakarta Sans', size: 11 }, padding: 12, usePointStyle: true } }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+    } catch(e) { console.error(e); }
+}
+
+// ─── ACTIVIDAD RECIENTE ───────────────────────────────────────
+async function cargarActividad() {
+    const el = document.getElementById('lista-actividad');
+    try {
+        const res  = await fetch(`${API}/admin/actividad`, { headers: authH() });
         const json = await res.json();
         if (!json.ok || !json.data.length) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted small">No hay documentos.</td></tr>';
+            el.innerHTML = '<div class="empty-state"><i class="bi bi-activity"></i><p class="small">Sin actividad registrada</p></div>';
             return;
         }
-        tbody.innerHTML = json.data.map(doc => `
-          <tr>
-            <td class="ps-4">
-              <span class="fw-bold small">${escHtml(doc.titulo)}</span>
-              <br><span class="text-muted" style="font-size:.72rem;">${escHtml(doc.descripcion || '')}</span>
-            </td>
-            <td><span class="badge rounded-pill bg-light text-dark border small">${escHtml(doc.etapa_nombre)}</span></td>
-            <td>
-              ${doc.nombre_archivo
-                ? `<span class="text-success small"><i class="bi bi-check-circle me-1"></i>${escHtml(doc.nombre_archivo)}</span>`
-                : `<span class="text-muted small"><i class="bi bi-dash me-1"></i>Sin archivo</span>`}
-            </td>
-            <td>
-              <span class="badge rounded-pill ${doc.vigente ? 'badge-vigente' : 'badge-inactivo'}">
-                ${doc.vigente ? 'Vigente' : 'Inactivo'}
-              </span>
-            </td>
-            <td class="pe-4">
-              <button class="btn btn-sm btn-outline-primary rounded-3 me-1" onclick="editarDoc(${doc.id})" title="Editar">
-                <i class="bi bi-pencil"></i>
-              </button>
-              ${window._rolActual === 'admin' ? `<button class="btn btn-sm btn-outline-danger rounded-3" onclick="eliminarDoc(${doc.id}, '${escHtml(doc.titulo)}')" title="Eliminar"><i class="bi bi-trash"></i></button>` : ''}
-            </td>
-          </tr>`).join('');
-        // Guardar data para edición
-        window._docsData = json.data;
-    } catch(err) {
-        console.error(err);
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger small">Error al cargar documentos.</td></tr>';
+        el.innerHTML = json.data.map(a => `
+            <div class="actividad-item">
+                <div class="actividad-icon"><i class="bi bi-download"></i></div>
+                <div style="overflow:hidden;">
+                    <div class="actividad-texto text-truncate">${esc(a.titulo)}</div>
+                    <div class="actividad-tiempo">${tiempoRelativo(a.fecha)} · ${esc(a.ip_origen || 'IP desconocida')}</div>
+                </div>
+            </div>`).join('');
+    } catch(e) {
+        el.innerHTML = '<div class="empty-state"><i class="bi bi-activity"></i><p class="small">Sin actividad</p></div>';
     }
 }
 
-// ─────────────────────────────────────────────
-//  MODAL DOCUMENTO
-// ─────────────────────────────────────────────
+// ─── TABLA DOCUMENTOS ─────────────────────────────────────────
+async function cargarTablaDocumentos() {
+    const tbody = document.getElementById('body-documentos');
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted small"><div class="spinner-border spinner-border-sm me-2"></div>Cargando...</td></tr>';
+    try {
+        const res  = await fetch(`${API}/admin/documentos`, { headers: authH() });
+        const json = await res.json();
+        _docsData  = json.data || [];
+        renderTablaDocumentos(_docsData);
+    } catch {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-danger small">Error al cargar documentos.</td></tr>';
+    }
+}
+
+function renderTablaDocumentos(docs) {
+    const tbody = document.getElementById('body-documentos');
+    if (!docs.length) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="bi bi-file-earmark-x"></i><p class="small">No hay documentos</p></div></td></tr>`;
+        return;
+    }
+    tbody.innerHTML = docs.map(doc => `
+        <tr>
+            <td class="ps-4">
+                <span class="fw-semibold small">${esc(doc.titulo)}</span>
+                <div class="text-muted" style="font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;">${esc(doc.descripcion||'')}</div>
+            </td>
+            <td><span class="badge rounded-pill" style="background:#f1f5f9;color:var(--text);font-size:.75rem;">${esc(doc.etapa_nombre)}</span></td>
+            <td>
+                ${doc.nombre_archivo
+                    ? `<span class="text-success small"><i class="bi bi-check-circle-fill me-1"></i>${esc(doc.nombre_archivo)}</span>`
+                    : `<span class="text-muted small"><i class="bi bi-dash me-1"></i>Sin archivo</span>`}
+            </td>
+            <td><span class="badge rounded-pill small ${doc.vigente ? 'badge-vigente' : 'badge-inactivo'}">${doc.vigente ? 'Vigente' : 'Inactivo'}</span></td>
+            <td class="pe-4">
+                <button class="btn btn-sm btn-outline-primary rounded-3 me-1" onclick="editarDoc(${doc.id})" title="Editar"><i class="bi bi-pencil-fill"></i></button>
+                ${_rolActual === 'admin' ? `<button class="btn btn-sm btn-outline-danger rounded-3" onclick="eliminarDoc(${doc.id},'${esc(doc.titulo)}')" title="Eliminar"><i class="bi bi-trash-fill"></i></button>` : ''}
+            </td>
+        </tr>`).join('');
+}
+
+function filtrarDocumentos(query) {
+    const q = query.toLowerCase();
+    renderTablaDocumentos(_docsData.filter(d =>
+        d.titulo.toLowerCase().includes(q) ||
+        (d.descripcion||'').toLowerCase().includes(q) ||
+        d.etapa_nombre.toLowerCase().includes(q)
+    ));
+}
+
+// ─── MODAL DOCUMENTO ─────────────────────────────────────────
 let modalDocBS;
 function abrirModalNuevoDoc() {
-    document.getElementById('modal-doc-titulo').textContent = 'Nuevo Documento';
-    document.getElementById('doc-id').value          = '';
-    document.getElementById('doc-titulo').value      = '';
-    document.getElementById('doc-etapa').value       = '1';
-    document.getElementById('doc-descripcion').value = '';
-    document.getElementById('doc-tipo').value        = 'formato';
-    document.getElementById('doc-orden').value       = '1';
-    document.getElementById('doc-vigente').value     = 'true';
-    document.getElementById('doc-archivo').value     = '';
+    ['doc-id','doc-titulo','doc-descripcion'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('doc-etapa').value   = '1';
+    document.getElementById('doc-tipo').value    = 'formato';
+    document.getElementById('doc-orden').value   = '1';
+    document.getElementById('doc-vigente').value = 'true';
+    document.getElementById('doc-archivo').value = '';
     document.getElementById('doc-guia-archivo').value = '';
+    document.getElementById('modal-doc-titulo').textContent = 'Nuevo Documento';
     document.getElementById('modal-doc-error').classList.add('d-none');
     modalDocBS = new bootstrap.Modal(document.getElementById('modalDocumento'));
     modalDocBS.show();
 }
 
 function editarDoc(id) {
-    const doc = window._docsData?.find(d => d.id === id);
+    const doc = _docsData.find(d => d.id === id);
     if (!doc) return;
-    document.getElementById('modal-doc-titulo').textContent = 'Editar Documento';
     document.getElementById('doc-id').value          = doc.id;
     document.getElementById('doc-titulo').value      = doc.titulo;
     document.getElementById('doc-etapa').value       = doc.etapa_id;
@@ -675,22 +1061,18 @@ function editarDoc(id) {
     document.getElementById('doc-vigente').value     = doc.vigente ? 'true' : 'false';
     document.getElementById('doc-archivo').value     = '';
     document.getElementById('doc-guia-archivo').value = '';
+    document.getElementById('modal-doc-titulo').textContent = 'Editar Documento';
     document.getElementById('modal-doc-error').classList.add('d-none');
     modalDocBS = new bootstrap.Modal(document.getElementById('modalDocumento'));
     modalDocBS.show();
 }
 
 async function guardarDocumento() {
-    const id       = document.getElementById('doc-id').value;
-    const spinner  = document.getElementById('spinner-doc');
-    const errEl    = document.getElementById('modal-doc-error');
-    const titulo   = document.getElementById('doc-titulo').value.trim();
-
-    if (!titulo) {
-        errEl.textContent = 'El título es requerido.';
-        errEl.classList.remove('d-none');
-        return;
-    }
+    const id     = document.getElementById('doc-id').value;
+    const titulo = document.getElementById('doc-titulo').value.trim();
+    const errEl  = document.getElementById('modal-doc-error');
+    const spinner = document.getElementById('spinner-doc');
+    if (!titulo) { errEl.textContent = 'El título es requerido.'; errEl.classList.remove('d-none'); return; }
 
     const fd = new FormData();
     fd.append('etapa_id',    document.getElementById('doc-etapa').value);
@@ -704,70 +1086,56 @@ async function guardarDocumento() {
     if (arch) fd.append('archivo', arch);
     if (guia) { fd.append('archivo_guia', guia); fd.append('tiene_guia', 'true'); }
 
-    const url    = id ? `${API}/admin/documentos/${id}` : `${API}/admin/documentos`;
-    const method = id ? 'PUT' : 'POST';
-
     spinner.classList.remove('d-none');
     errEl.classList.add('d-none');
     document.getElementById('btn-guardar-doc').disabled = true;
-
     try {
-        const res  = await fetch(url, { method, headers: authHeaders(), body: fd });
+        const res  = await fetch(id ? `${API}/admin/documentos/${id}` : `${API}/admin/documentos`, { method: id ? 'PUT' : 'POST', headers: authH(), body: fd });
         const json = await res.json();
-        if (!json.ok) {
-            errEl.textContent = json.mensaje;
-            errEl.classList.remove('d-none');
-        } else {
+        if (!json.ok) { errEl.textContent = json.mensaje; errEl.classList.remove('d-none'); }
+        else {
             modalDocBS.hide();
+            toast(id ? 'Documento actualizado' : 'Documento creado');
             cargarTablaDocumentos();
             cargarEstadisticas();
         }
-    } catch {
-        errEl.textContent = 'Error de conexión.';
-        errEl.classList.remove('d-none');
-    } finally {
-        spinner.classList.add('d-none');
-        document.getElementById('btn-guardar-doc').disabled = false;
-    }
+    } catch { errEl.textContent = 'Error de conexión.'; errEl.classList.remove('d-none'); }
+    finally { spinner.classList.add('d-none'); document.getElementById('btn-guardar-doc').disabled = false; }
 }
 
 async function eliminarDoc(id, titulo) {
-    if (!confirm(`¿Eliminar "${titulo}"?\n\nEsta acción borrará el archivo del servidor.`)) return;
+    if (!confirm(`¿Eliminar "${titulo}"?\n\nEsta acción también borra el archivo del servidor.`)) return;
     try {
-        const res  = await fetch(`${API}/admin/documentos/${id}`, {
-            method: 'DELETE', headers: authHeaders()
-        });
+        const res  = await fetch(`${API}/admin/documentos/${id}`, { method: 'DELETE', headers: authH() });
         const json = await res.json();
-        if (json.ok) { cargarTablaDocumentos(); cargarEstadisticas(); }
-        else alert('Error: ' + json.mensaje);
-    } catch { alert('Error de conexión.'); }
+        if (json.ok) { toast('Documento eliminado', 'info'); cargarTablaDocumentos(); cargarEstadisticas(); }
+        else toast(json.mensaje, 'error');
+    } catch { toast('Error de conexión', 'error'); }
 }
 
-// ─────────────────────────────────────────────
-//  TABLA USUARIOS
-// ─────────────────────────────────────────────
+// ─── TABLA USUARIOS ───────────────────────────────────────────
 async function cargarTablaUsuarios() {
     const tbody = document.getElementById('body-usuarios');
-    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted small">Cargando...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-muted small"><div class="spinner-border spinner-border-sm me-2"></div>Cargando...</td></tr>';
     try {
-        const res  = await fetch(`${API}/admin/usuarios`, { headers: authHeaders() });
+        const res  = await fetch(`${API}/admin/usuarios`, { headers: authH() });
         const json = await res.json();
         tbody.innerHTML = json.data.map(u => `
-          <tr>
-            <td class="ps-4 fw-bold small">${escHtml(u.nombre)}</td>
-            <td class="small text-muted">${escHtml(u.email)}</td>
-            <td><span class="badge rounded-pill ${u.rol === 'admin' ? 'bg-warning text-dark' : 'bg-info text-dark'}">${u.rol === 'admin' ? '👑 Admin' : '📋 Gestor'}</span></td>
-            <td><span class="badge rounded-pill ${u.activo ? 'badge-vigente' : 'badge-inactivo'}">${u.activo ? 'Activo' : 'Inactivo'}</span></td>
-            <td class="pe-4 small text-muted">${new Date(u.created_at).toLocaleDateString('es-MX')}</td>
-          </tr>`).join('');
-    } catch { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-danger small">Error.</td></tr>'; }
+            <tr>
+                <td class="ps-4 fw-semibold small">${esc(u.nombre)}</td>
+                <td class="small text-muted">${esc(u.email)}</td>
+                <td><span class="badge rounded-pill small ${u.rol === 'admin' ? 'badge-admin' : 'badge-gestor'}">${u.rol === 'admin' ? '👑 Admin' : '📋 Gestor'}</span></td>
+                <td><span class="badge rounded-pill small ${u.activo ? 'badge-vigente' : 'badge-inactivo'}">${u.activo ? 'Activo' : 'Inactivo'}</span></td>
+                <td class="small text-muted">${new Date(u.created_at).toLocaleDateString('es-MX')}</td>
+                <td><button class="btn btn-sm btn-outline-danger rounded-3" onclick="eliminarUsuario(${u.id},'${esc(u.nombre)}')" title="Eliminar"><i class="bi bi-trash-fill"></i></button></td>
+            </tr>`).join('');
+    } catch { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-danger small">Error.</td></tr>'; }
 }
 
 let modalUsrBS;
 function abrirModalNuevoUsuario() {
-    document.getElementById('usr-nombre').value   = '';
-    document.getElementById('usr-email').value    = '';
-    document.getElementById('usr-password').value = '';
+    ['usr-nombre','usr-email','usr-password'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('usr-rol').value = 'gestor';
     document.getElementById('modal-usr-error').classList.add('d-none');
     modalUsrBS = new bootstrap.Modal(document.getElementById('modalUsuario'));
     modalUsrBS.show();
@@ -781,23 +1149,26 @@ async function guardarUsuario() {
         password: document.getElementById('usr-password').value,
         rol:      document.getElementById('usr-rol').value
     };
-    if (!body.nombre || !body.email || !body.password) {
-        errEl.textContent = 'Todos los campos son requeridos.';
-        errEl.classList.remove('d-none'); return;
-    }
+    if (!body.nombre || !body.email || !body.password) { errEl.textContent = 'Todos los campos son requeridos.'; errEl.classList.remove('d-none'); return; }
     try {
-        const res  = await fetch(`${API}/admin/usuarios`, {
-            method: 'POST', headers: authHeadersJson(), body: JSON.stringify(body)
-        });
+        const res  = await fetch(`${API}/admin/usuarios`, { method: 'POST', headers: authHJson(), body: JSON.stringify(body) });
         const json = await res.json();
         if (!json.ok) { errEl.textContent = json.mensaje; errEl.classList.remove('d-none'); }
-        else { modalUsrBS.hide(); cargarTablaUsuarios(); }
+        else { modalUsrBS.hide(); toast('Usuario creado correctamente'); cargarTablaUsuarios(); }
     } catch { errEl.textContent = 'Error de conexión.'; errEl.classList.remove('d-none'); }
 }
 
-// ─────────────────────────────────────────────
-//  UTILS
-// ─────────────────────────────────────────────
+async function eliminarUsuario(id, nombre) {
+    if (!confirm(`¿Eliminar al usuario "${nombre}"?`)) return;
+    try {
+        const res  = await fetch(`${API}/admin/usuarios/${id}`, { method: 'DELETE', headers: authH() });
+        const json = await res.json();
+        if (json.ok) { toast('Usuario eliminado', 'info'); cargarTablaUsuarios(); }
+        else toast(json.mensaje, 'error');
+    } catch { toast('Error de conexión', 'error'); }
+}
+
+// ─── SIDEBAR MÓVIL ───────────────────────────────────────────
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('abierto');
     document.getElementById('overlay-sidebar').classList.toggle('visible');
@@ -805,11 +1176,6 @@ function toggleSidebar() {
 function cerrarSidebar() {
     document.getElementById('sidebar').classList.remove('abierto');
     document.getElementById('overlay-sidebar').classList.remove('visible');
-}
-function escHtml(str) {
-    return String(str || '')
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
 </body>
